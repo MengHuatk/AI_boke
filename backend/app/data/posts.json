@@ -1,0 +1,62 @@
+[
+  {
+    "id": "p-001",
+    "slug": "glassmorphism-in-practice",
+    "title": "毛玻璃不是加个 backdrop-blur 就完事了",
+    "excerpt": "半透明面板谁都会写，难的是让它在深色背景、浅色背景、以及用户那台偏色的显示器上都好看。这篇记录我调整模糊半径、边框高光和阴影层次的过程。",
+    "cover": null,
+    "tags": ["设计", "CSS", "前端"],
+    "published_at": "2026-09-28",
+    "reading_minutes": 8,
+    "featured": true,
+    "body": "毛玻璃效果的核心其实不在模糊本身，而在于三层叠加：背景模糊、内描边高光、以及投影。缺任何一层，面板都会显得像一块脏掉的塑料片。\n\n第一层是 backdrop-filter 的模糊半径。半径太小看不出磨砂感，太大则会糊掉背后的形状，失去「透视」的意义。实践中 12px 到 20px 是比较安全的区间。\n\n第二层是 1px 的内描边。用 inset box-shadow 在顶部打一道白色半透明高光，模拟光线从上方掠过玻璃边缘的效果。这一层往往决定了精致与否。\n\n第三层是投影。玻璃面板需要往外投影而非往内，且应该是大范围、低透明度的柔和阴影，而不是那种生硬的黑色方块。"
+  },
+  {
+    "id": "p-002",
+    "slug": "nextjs-app-router-notes",
+    "title": "App Router 用了两年，我留下了这五条习惯",
+    "excerpt": "服务端组件不是银弹，客户端组件也不该被妖魔化。真正的分界线是「这个组件需不需要交互状态」，而不是「这个组件复不复杂」。",
+    "cover": null,
+    "tags": ["Next.js", "React", "前端"],
+    "published_at": "2026-09-12",
+    "reading_minutes": 11,
+    "featured": true,
+    "body": "习惯一：默认写服务端组件，只有当组件内部真正用到了 useState、useEffect 或者浏览器 API 时，才在文件顶部加上 use client。\n\n习惯二：把 use client 尽可能地往叶子节点推。一个页面里只有搜索框需要交互，那就只让搜索框变成客户端组件，而不是整个页面。\n\n习惯三：数据获取放在服务端组件里，直接 await。这样首屏就没有瀑布式请求，也不需要 loading 骨架屏。\n\n习惯四：路由段的 layout.tsx 用来放导航和页脚这类不会随路由变化的部分，避免每次跳转都重新渲染。\n\n习惯五：metadata 导出放在服务端组件里，客户端组件无法导出 metadata。"
+  },
+  {
+    "id": "p-003",
+    "slug": "fastapi-project-layout",
+    "title": "FastAPI 项目该怎么分层，才不会三个月后推倒重来",
+    "excerpt": "分层的目的不是好看，而是让你换数据库的那一天只改一个文件。路由层不碰 SQL，仓储层不碰 HTTP。",
+    "cover": null,
+    "tags": ["Python", "FastAPI", "后端"],
+    "published_at": "2026-08-30",
+    "reading_minutes": 9,
+    "featured": true,
+    "body": "很多 FastAPI 项目一开始把数据库查询直接写在路由函数里，起步很快，但等到要换 ORM 或者加缓存时，就会发现问题散落在几十个文件里。\n\n我的做法是把项目切成四层：api 负责 HTTP 语义，models 负责数据结构，repositories 负责数据存取，core 负责配置。\n\n关键在于 repositories 定义的是抽象接口而不是具体实现。路由依赖接口，不依赖实现。这样从 JSON 切到 PostgreSQL，只需要新增一个实现类，路由里一行都不用改。\n\n配置同理，用 pydantic-settings 把所有可变项收口到环境变量，代码里不出现任何硬编码的连接串或路径。"
+  },
+  {
+    "id": "p-004",
+    "slug": "why-i-still-write-blog",
+    "title": "在 AI 能写完一切代码的年代，我为什么还在写博客",
+    "excerpt": "因为写下来的过程本身就是思考。把一件事讲清楚，和把一件事做出来，需要的是两种完全不同的能力。",
+    "cover": null,
+    "tags": ["随笔"],
+    "published_at": "2026-08-08",
+    "reading_minutes": 5,
+    "featured": false,
+    "body": "代码可以生成，但判断力不能。知道该用哪个方案、知道哪个坑不能踩，这些只能从踩坑里长出来。\n\n而写作是把隐性的经验显性化的过程。当你试图向一个陌生人解释为什么这样设计时，很多模糊的直觉会被迫变成清晰的论证。\n\n所以这个博客首先是写给我自己的。如果它恰好对你有用，那是意外之喜。"
+  },
+  {
+    "id": "p-005",
+    "slug": "tailwind-v4-theme-tokens",
+    "title": "Tailwind v4 的 @theme：终于可以不用 tailwind.config.js 了",
+    "excerpt": "CSS-first 配置意味着设计令牌回归 CSS 变量。好处是运行时可以改主题，坏处是你得重新想清楚哪些值该被抽象。",
+    "cover": null,
+    "tags": ["CSS", "Tailwind", "前端"],
+    "published_at": "2026-07-21",
+    "reading_minutes": 7,
+    "featured": false,
+    "body": "v4 把配置搬进了 CSS，用 @theme 块声明设计令牌，声明出来的变量会自动生成对应的工具类。\n\n这带来的直接好处是：主题切换不再需要重新构建，因为令牌本身就是 CSS 变量，运行时改一个根节点的属性就能整体换肤。\n\n需要重新思考的是抽象粒度。不是所有数值都值得成为令牌，只有那些「会在多个地方重复出现、且未来可能整体调整」的值才值得。\n\n比如圆角、模糊半径、主色调、面板背景透明度，这些值得。而某个卡片特有的内边距，就不值得。"
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "name": "林澈",
+  "avatar": "/avatar.svg",
+  "headline": "全栈工程师 · 独立开发者",
+  "bio": "白天写 TypeScript 和 Python，晚上折腾各种没人用的 side project。相信好的界面应该让人一眼就想点一下。",
+  "location": "杭州",
+  "skills": ["TypeScript", "React", "Next.js", "Python", "FastAPI", "Tailwind CSS"]
+}

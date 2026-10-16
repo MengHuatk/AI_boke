@@ -1,0 +1,17 @@
+{
+  "name": "Glass Notes",
+  "title": "Glass Notes · 写代码，也写生活",
+  "description": "一个毛玻璃风格的个人博客，记录前端、后端，以及那些没写完的 side project。",
+  "author": "林澈",
+  "nav": [
+    { "label": "首页", "href": "/" },
+    { "label": "文章", "href": "/posts" },
+    { "label": "标签", "href": "/tags" },
+    { "label": "关于", "href": "/about" }
+  ],
+  "socials": [
+    { "label": "GitHub", "href": "https://github.com/", "icon": "github" },
+    { "label": "邮箱", "href": "mailto:hello@example.com", "icon": "mail" },
+    { "label": "RSS", "href": "/rss.xml", "icon": "rss" }
+  ]
+}

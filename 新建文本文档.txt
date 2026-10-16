@@ -1,0 +1,4 @@
+cd d:/web_project/AI_project/backend
+.venv/Scripts/activate
+uvicorn app.main:app --reload --port 8000cd d:/web_project/AI_project/frontend
+npm run dev
