@@ -57,8 +57,12 @@ export const backgroundConfig = {
   /** 背景图上的压暗遮罩强度，0–1。越大玻璃面板上的文字越清晰，照片越不明显 */
   imageDim: readNumber(process.env.NEXT_PUBLIC_BACKGROUND_IMAGE_DIM, 0.6),
 
-  /** 背景图模糊半径（px）。适度模糊能让照片不抢玻璃面板的焦点 */
-  imageBlur: readNumber(process.env.NEXT_PUBLIC_BACKGROUND_IMAGE_BLUR, 0),
+  /**
+   * 背景图模糊半径（px）。适度模糊能让照片不抢玻璃面板的焦点。0 = 不模糊。
+   * 默认 12px：照片退成一片柔和色晕，仍认得出构图走向，但高频纹理不再干扰
+   * 玻璃面板上的浅色文字。半径超过 20 就基本只剩色相，等于放弃了照片本身。
+   */
+  imageBlur: readNumber(process.env.NEXT_PUBLIC_BACKGROUND_IMAGE_BLUR, 12),
 
   /** 背景图整体不透明度，0–1 */
   imageOpacity: readNumber(process.env.NEXT_PUBLIC_BACKGROUND_IMAGE_OPACITY, 1),

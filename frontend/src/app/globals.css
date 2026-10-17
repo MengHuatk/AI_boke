@@ -33,6 +33,10 @@
   --color-brand-500: oklch(0.63 0.19 275);
   --color-brand-600: oklch(0.55 0.21 275);
 
+  /* ---------- 强调色（导航选中 / hover） ---------- */
+  --color-neon-500: #906eff;
+  --color-neon-600: #5d2bff;
+
   /* ---------- 极光配色（背景光斑） ---------- */
   --color-aurora-violet: oklch(0.62 0.25 300);
   --color-aurora-cyan: oklch(0.80 0.13 210);
@@ -129,6 +133,20 @@
   box-shadow:
     inset 0 1px 0 0 rgb(255 255 255 / 0.2),
     0 16px 44px -18px rgb(2 6 23 / 0.75);
+}
+
+/* 顶部导航专用：通栏无圆角，底色比加强玻璃再深一档，保证压住轮播背景 */
+@utility glass-panel-nav {
+  background-color: rgb(6 8 18 / 0.6);
+  background-image: linear-gradient(
+    145deg,
+    rgb(6 6 6 / 0.06) 0%,
+    rgb(6 6 6/ 0.02) 100%
+  );
+  backdrop-filter: blur(var(--blur-glass-heavy)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur-glass-heavy)) saturate(180%);
+  border: none;
+  box-shadow: 0 16px 44px -18px rgb(2 6 23 / 0.75);
 }
 
 /* 弱玻璃：用于内嵌的小零件（标签、次级信息块），不抢视觉重心 */

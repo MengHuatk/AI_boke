@@ -18,8 +18,14 @@ export const fallbackHome: HomePayload = {
     author: "林澈",
     nav: [
       { label: "首页", href: "/" },
-      { label: "文章", href: "/posts" },
-      { label: "标签", href: "/tags" },
+      { label: "项目", href: "/projects" },
+      { label: "归档", href: "/archive" },
+      { label: "照片墙", href: "/photos" },
+      { label: "音乐", href: "/music" },
+      { label: "灵境", href: "/realm" },
+      { label: "说说", href: "/moments" },
+      { label: "杂谈", href: "/talks" },
+      { label: "友链", href: "/links" },
       { label: "关于", href: "/about" },
     ],
     socials: [
@@ -30,8 +36,8 @@ export const fallbackHome: HomePayload = {
   },
 
   profile: {
-    name: "林澈",
-    avatar: "/avatar.svg",
+    name: "梦华",
+    avatar: "/avatar.jpg",
     headline: "全栈工程师 · 独立开发者",
     bio: "白天写 TypeScript 和 Python，晚上折腾各种没人用的 side project。相信好的界面应该让人一眼就想点一下。",
     location: "杭州",

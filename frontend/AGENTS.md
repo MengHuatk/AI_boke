@@ -1,9 +1,12 @@
-<!-- BEGIN:nextjs-agent-rules -->
+## 文件读取边界
 
-## This is NOT the Next.js you know
+- 严禁读取 `node_modules`、`.next`、`dist`、`build` 等依赖或构建目录。
+- 搜索代码时，必须限制范围。
+- 其他与当前项目无关的组件库、组件包、依赖目录等，一律禁止读取。
+- 需修改样式时，仅读取相关组件及全局 CSS 文件，严禁对整个项目进行全量扫描。
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
+**执行要求**
+- 上述目录不进入读取、搜索或遍历范围；不得以"了解依赖实现""查看组件源码"等理由读取。
+- 需要组件或库的用法时，只依据项目内已有代码、官方文档或类型声明，不翻包内源码。
+- 若确实必须查看某个依赖（如排查版本冲突、确认导出签名），先说明原因并取得确认，再读取最小必要文件。
+- 需修改样式时，仅读取相关组件及全局 CSS 文件，严禁对整个项目进行全量扫描。
