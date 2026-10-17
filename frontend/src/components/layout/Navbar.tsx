@@ -64,15 +64,32 @@ function NavLink({
  * 因为是客户端组件（需要读 usePathname 做当前页高亮），站点配置由
  * SiteShell 作为 props 传进来，这里不再自己发请求。
  */
+/** 滚动收起阈值：超过这个距离导航栏滑出隐藏，回到它之上则重新拉出 */
+const HIDE_SCROLL_Y = 50;
+
 export function Navbar({ site }: NavbarProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolledPast, setScrolledPast] = useState(false);
 
   // 换页后收起移动端菜单，否则点完链接菜单还挂在那儿
   useEffect(() => setMenuOpen(false), [pathname]);
 
+  // 跟随滚动位置切换导航栏显隐状态
+  useEffect(() => {
+    const onScroll = () => setScrolledPast(window.scrollY > HIDE_SCROLL_Y);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50">
+    <header
+      className={cn(
+        "sticky top-0 z-50 transition-transform duration-300 ease-out",
+        scrolledPast && "-translate-y-full"
+      )}
+    >
       <nav className="glass-panel-nav flex h-18 items-center">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           {/* 站名 */}
