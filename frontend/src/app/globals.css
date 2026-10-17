@@ -12,11 +12,24 @@
    想整体换肤，改这一节即可，不需要动任何组件。
    ========================================================================== */
 
+/* 弹幕层专用字体：站酷快乐体。
+   不走 next/font 而在 public 里按 URL 直引——只有 DanMu 一层用它，且全 CJK 字形集很大，
+   没必要进构建管线；font-display: swap 让弹幕先以回退字体飘出来，加载完再换，不挡渲染 */
+@font-face {
+  font-family: "ZCOOL KuaiLe";
+  src: url("/font/ZCOOLKuaiLe-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   /* ---------- 字体 ---------- */
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, "PingFang SC",
     "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* 弹幕层用（消费方 DanMu.tsx 的 font-danmu），回退走全站正文字体 */
+  --font-danmu: "ZCOOL KuaiLe", var(--font-sans);
 
   /* ---------- 圆角 ---------- */
   --radius-glass: 1.25rem;
@@ -111,7 +124,7 @@
 }
 
 /* 首页萤火虫层：外层 translate 漂移、内层 scale + opacity 生灭。
-   漂移与生灭同时长、同相位，单段直线匀速（组件侧用 linear）；
+   漂移时长是生灭的整数倍、两者同相位（组件侧锁的），单段直线匀速（linear）；
    循环复位的那一跳恰好落在点缩到 scale(0)、opacity 0 的 0% 处，看不见跳变，
    也永远不会出现中途掉头或折返。
    生灭三段比例写死（15% / 70% / 15%），因为关键帧的位置不接受 var()；
@@ -142,6 +155,20 @@
   }
   100% {
     transform: translate3d(var(--dx, 0px), var(--dy, 0px), 0);
+  }
+}
+
+/* 首页弹幕层：一条直线，从视口右侧外匀速走到左侧外。
+   linear 是需求要求的「慢慢匀速」，ease 会在两端减速，反而把出生与消亡露出来；
+   起止两点都在视口外，所以循环结束不需要接回原点。
+   消费方是 DanMu.tsx，配合 animation-fill-mode: forwards 使用——
+   没有 forwards，动画结束那一帧元素会退回 left:0 闪现在视口左边缘 */
+@keyframes danmu-drift {
+  from {
+    transform: translate3d(100vw, 0, 0);
+  }
+  to {
+    transform: translate3d(-100%, 0, 0);
   }
 }
 

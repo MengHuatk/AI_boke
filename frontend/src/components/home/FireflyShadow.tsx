@@ -7,7 +7,8 @@
  * pointer-events-none 保证完全不挡交互。
  *
  * 一只萤火虫拆成两层 span，各管一个 transform，互不覆盖：
- *   - 外层只做平移（firefly-wander），四个锚点首尾回到原点，无限循环不跳变；
+ *   - 外层只做平移（firefly-wander），单段直线从原点匀速飘到 (dx, dy)，
+ *     循环复位的那一跳藏在生灭缩到 scale(0) 的时刻，看不见跳变；
  *   - 内层只做缩放与透明度（firefly-life），呈现「长大 → 亮着飘 → 收小」；
  *   - 光晕是内层的双层 box-shadow（近实远虚），被外层 scale 一并缩放，
  *     所以晕会跟着点一起长大，不需要单独动画。
@@ -39,19 +40,13 @@ interface Firefly {
   life: number;
   /** 生灭相位，负值 */
   lifeDelay: number;
-  /** 漂移一轮时长，s */
+  /** 漂移一轮总时长，s；恒为生灭的整数倍，复位跳必落在生灭暗点 */
   wander: number;
-  /** 漂移相位，负值 */
+  /** 漂移相位，负值；恒等于 lifeDelay，把两个周期绑死在同一条时间线上 */
   wanderDelay: number;
-  /** 第一个漂移锚点位移，px */
-  w1x: number;
-  w1y: number;
-  /** 第二个漂移锚点位移，px */
-  w2x: number;
-  w2y: number;
-  /** 第三个漂移锚点位移，px */
-  w3x: number;
-  w3y: number;
+  /** 漂移终点位移，px；起点恒为元素原位，直线走过去再循环复位 */
+  dx: number;
+  dy: number;
 }
 
 const RANGE = {
@@ -67,8 +62,9 @@ const RANGE = {
   peakMax: 0.95,
   lifeMin: 6,
   lifeMax: 8,
-  wanderMin: 15,
-  wanderMax: 20,
+  /** 漂移跨几轮生灭，整数倍（2–3），替代原先独立摇 15–20s 的做法 */
+  cyclesMin: 2,
+  cyclesSpan: 2,
   wanderAmplitudeMin: 25,
   wanderAmplitudeMax: 90,
 } as const;
@@ -87,23 +83,27 @@ function signedBetween(min: number, max: number): number {
 function generateFireflies(): Firefly[] {
   const count = RANGE.countMin + Math.floor(Math.random() * RANGE.countSpan);
 
-  return Array.from({ length: count }, () => ({
-    x: randomBetween(RANGE.xMin, RANGE.xMax),
-    y: randomBetween(RANGE.yMin, RANGE.yMax),
-    size: randomBetween(RANGE.sizeMin, RANGE.sizeMax),
-    peak: randomBetween(RANGE.peakMin, RANGE.peakMax),
-    life: randomBetween(RANGE.lifeMin, RANGE.lifeMax),
+  return Array.from({ length: count }, () => {
+    const life = randomBetween(RANGE.lifeMin, RANGE.lifeMax);
     // 负延迟 + 上界随机：让每只从周期中段开始，且任一相位都可能被抽中
-    lifeDelay: -randomBetween(0, RANGE.lifeMax),
-    wander: randomBetween(RANGE.wanderMin, RANGE.wanderMax),
-    wanderDelay: -randomBetween(0, RANGE.wanderMax),
-    w1x: signedBetween(RANGE.wanderAmplitudeMin, RANGE.wanderAmplitudeMax),
-    w1y: signedBetween(RANGE.wanderAmplitudeMin, RANGE.wanderAmplitudeMax),
-    w2x: signedBetween(RANGE.wanderAmplitudeMin, RANGE.wanderAmplitudeMax),
-    w2y: signedBetween(RANGE.wanderAmplitudeMin, RANGE.wanderAmplitudeMax),
-    w3x: signedBetween(RANGE.wanderAmplitudeMin, RANGE.wanderAmplitudeMax),
-    w3y: signedBetween(RANGE.wanderAmplitudeMin, RANGE.wanderAmplitudeMax),
-  }));
+    const lifeDelay = -randomBetween(0, RANGE.lifeMax);
+    // 漂移取生灭的整数倍、共用同一相位：漂移复位的那一跳必然落在生灭缩到
+    // scale(0) 的暗点上，不会出现亮球凭空瞬移
+    const cycles = RANGE.cyclesMin + Math.floor(Math.random() * RANGE.cyclesSpan);
+
+    return {
+      x: randomBetween(RANGE.xMin, RANGE.xMax),
+      y: randomBetween(RANGE.yMin, RANGE.yMax),
+      size: randomBetween(RANGE.sizeMin, RANGE.sizeMax),
+      peak: randomBetween(RANGE.peakMin, RANGE.peakMax),
+      life,
+      lifeDelay,
+      wander: life * cycles,
+      wanderDelay: lifeDelay,
+      dx: signedBetween(RANGE.wanderAmplitudeMin, RANGE.wanderAmplitudeMax),
+      dy: signedBetween(RANGE.wanderAmplitudeMin, RANGE.wanderAmplitudeMax),
+    };
+  });
 }
 
 // useSyncExternalStore 要求 getSnapshot 返回稳定引用：客户端首次读取时生成，之后复用
@@ -146,12 +146,8 @@ export function FireflyShadow() {
               marginLeft: `${-fly.size / 2}px`,
               marginTop: `${-fly.size / 2}px`,
               animation: `firefly-wander ${fly.wander}s linear ${fly.wanderDelay}s infinite`,
-              "--w1x": `${fly.w1x}px`,
-              "--w1y": `${fly.w1y}px`,
-              "--w2x": `${fly.w2x}px`,
-              "--w2y": `${fly.w2y}px`,
-              "--w3x": `${fly.w3x}px`,
-              "--w3y": `${fly.w3y}px`,
+              "--dx": `${fly.dx}px`,
+              "--dy": `${fly.dy}px`,
             } as CSSProperties
           }
         >

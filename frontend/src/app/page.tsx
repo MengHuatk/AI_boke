@@ -1,3 +1,4 @@
+import { DanMu } from "@/components/home/DanMu";
 import { FeaturedPosts } from "@/components/home/FeaturedPosts";
 import { FireflyShadow } from "@/components/home/FireflyShadow";
 import { GrassField } from "@/components/home/GrassField";
@@ -36,6 +37,9 @@ export default async function HomePage() {
 
       {/* 视空中的萤火虫光点层，垫在草地之上、所有内容之下，仅电脑端显示 */}
       <FireflyShadow />
+
+      {/* 视口上三分之一的字体弹幕层，垫在萤火虫之上、所有内容之下，仅电脑端显示 */}
+      <DanMu />
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         {/* 左栏：自我介绍 + 精选文章 */}
