@@ -110,6 +110,41 @@
   }
 }
 
+/* 首页萤火虫层：外层 translate 漂移、内层 scale + opacity 生灭。
+   漂移与生灭同时长、同相位，单段直线匀速（组件侧用 linear）；
+   循环复位的那一跳恰好落在点缩到 scale(0)、opacity 0 的 0% 处，看不见跳变，
+   也永远不会出现中途掉头或折返。
+   生灭三段比例写死（15% / 70% / 15%），因为关键帧的位置不接受 var()；
+   --peak 与 --dx / --dy 由 FireflyShadow.tsx 逐只注入。
+   消费方是 FireflyShadow.tsx */
+@keyframes firefly-life {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  15%,
+  85% {
+    transform: scale(1);
+    opacity: var(--peak, 0.9);
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/* 漂移：一段直线，从原点匀速走到 --dx/--dy 指定的终点；
+   timing-function 用 linear 是刻意的——ease 会在两端减速停顿，
+   而这里的终点跳回原点藏在不透明处，加减速反而会把戏法露出来 */
+@keyframes firefly-wander {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(var(--dx, 0px), var(--dy, 0px), 0);
+  }
+}
+
 /* ==========================================================================
    毛玻璃配方
    —— 三层叠加：背景模糊 + 内描边高光 + 外投影，缺一层就会显得像脏塑料片

@@ -1,4 +1,5 @@
 import { FeaturedPosts } from "@/components/home/FeaturedPosts";
+import { FireflyShadow } from "@/components/home/FireflyShadow";
 import { GrassField } from "@/components/home/GrassField";
 import { HeroSection } from "@/components/home/HeroSection";
 import { StatsCard } from "@/components/home/StatsCard";
@@ -32,6 +33,9 @@ export default async function HomePage() {
 
       {/* 视口底部的草坪装饰层，垫在所有内容之下，仅电脑端显示 */}
       <GrassField />
+
+      {/* 视空中的萤火虫光点层，垫在草地之上、所有内容之下，仅电脑端显示 */}
+      <FireflyShadow />
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         {/* 左栏：自我介绍 + 精选文章 */}
