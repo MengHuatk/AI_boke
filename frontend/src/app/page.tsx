@@ -1,4 +1,5 @@
 import { FeaturedPosts } from "@/components/home/FeaturedPosts";
+import { GrassField } from "@/components/home/GrassField";
 import { HeroSection } from "@/components/home/HeroSection";
 import { StatsCard } from "@/components/home/StatsCard";
 import { TagCloud } from "@/components/home/TagCloud";
@@ -28,6 +29,9 @@ export default async function HomePage() {
       {source === "fallback" && (
         <DevNotice message="后端未连接，当前展示的是本地示例数据。启动 backend 后刷新即可看到真实内容。" />
       )}
+
+      {/* 视口底部的草坪装饰层，垫在所有内容之下，仅电脑端显示 */}
+      <GrassField />
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         {/* 左栏：自我介绍 + 精选文章 */}

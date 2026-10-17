@@ -23,8 +23,8 @@
   --radius-glass-lg: 1.75rem;
 
   /* ---------- 模糊强度 ---------- */
-  --blur-glass: 16px;
-  --blur-glass-heavy: 32px;
+  --blur-glass: 32px;
+  --blur-glass-heavy: 64px;
 
   /* ---------- 主色（靛紫） ---------- */
   --color-brand-200: oklch(0.90 0.05 275);
@@ -94,6 +94,19 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+/* 首页草坪层的草叶：skewX 负责静态预弯，rotate 绕底边中心摇摆，
+   --amp / --skew 由 GrassField.tsx 逐棵注入。
+   阵风感不靠关键帧，靠每棵草的 animation-delay 随水平位置递增 */
+@keyframes grass-sway {
+  0%,
+  100% {
+    transform: skewX(var(--skew, 0deg)) rotate(calc(var(--amp, 12deg) * -1));
+  }
+  50% {
+    transform: skewX(var(--skew, 0deg)) rotate(var(--amp, 12deg));
   }
 }
 
