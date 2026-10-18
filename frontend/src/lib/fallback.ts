@@ -12,10 +12,10 @@ import type { HomePayload } from "@/lib/types";
 
 export const fallbackHome: HomePayload = {
   site: {
-    name: "Glass Notes",
-    title: "Glass Notes · 写代码，也写生活",
-    description: "一个毛玻璃风格的个人博客，记录前端、后端，以及那些没写完的 side project。",
-    author: "林澈",
+    name: "个人博客",
+    title: "梦华の小站",
+    description: "世上只有一种英雄主义，那就是认清生活之后依旧热爱生活的人。",
+    author: "梦华",
     nav: [
       { label: "首页", href: "/" },
       { label: "项目", href: "/projects" },
@@ -39,8 +39,8 @@ export const fallbackHome: HomePayload = {
     name: "梦华",
     avatar: "/avatar.jpg",
     headline: "全栈工程师 · 独立开发者",
-    bio: "白天写 TypeScript 和 Python，晚上折腾各种没人用的 side project。相信好的界面应该让人一眼就想点一下。",
-    location: "杭州",
+    bio: "一位努力生活在普通中的普通人",
+    location: "成都",
     skills: ["TypeScript", "React", "Next.js", "Python", "FastAPI", "Tailwind CSS"],
   },
 
