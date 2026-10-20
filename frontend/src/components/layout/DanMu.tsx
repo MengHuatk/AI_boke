@@ -46,6 +46,8 @@ const DANMU_TEXTS: readonly string[] = [
   "以天制大地，以地除要枢",
   "纵使只有一线蛛丝，也可籍此找到极乐的境界。",
   "所谓历史，就是在寻常的时候让时间前进，在非同寻常的时候将时间的前进状态记录下来的东西。",
+  "完美潇洒の女仆",
+  "全人类の绯想天",
 ];
 
 interface Danmu {
@@ -178,7 +180,7 @@ export function DanMu() {
         <span
           key={danmu.id}
           onAnimationEnd={() => handleExited(danmu)}
-          className="absolute left-0 whitespace-nowrap font-danmu text-[20px] leading-none text-white/45"
+          className="absolute left-0 whitespace-nowrap font-danmu text-[20px] leading-none text-white/25"
           style={{
             top: `${danmu.top}px`,
             animation: `danmu-drift ${danmu.duration}s linear forwards`,

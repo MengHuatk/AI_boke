@@ -300,6 +300,38 @@
 }
 
 /* ==========================================================================
+   归档栅格滚动条（ArchiveGrid 的 .archive-scroll）
+   覆盖基础层的细白滚动条：深紫色圆条，hover / 拖动时变浅紫。
+   类选择器天然压过 `*` 通配规则，无需 !important。
+   ========================================================================== */
+
+.archive-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-neon-600) transparent;
+}
+
+.archive-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.archive-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--color-neon-600);
+  /* 2px 透明边 + padding-box：把滑块裁成比槽位窄一圈的圆条，两端呈胶囊状 */
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+.archive-scroll::-webkit-scrollbar-thumb:hover,
+.archive-scroll::-webkit-scrollbar-thumb:active {
+  background-color: var(--color-neon-500);
+}
+
+.archive-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ==========================================================================
    无障碍：尊重系统的「减少动态效果」设置
    ========================================================================== */
 

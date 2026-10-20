@@ -50,7 +50,7 @@ interface Firefly {
 }
 
 const RANGE = {
-  countMin: 10,
+  countMin: 13,
   countSpan: 6,
   xMin: 2,
   xMax: 98,
