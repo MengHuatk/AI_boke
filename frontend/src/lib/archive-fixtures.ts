@@ -1,0 +1,163 @@
+import type { PostSummary } from "@/lib/types";
+
+/**
+ * 归档页测试数据。真实归档数据接入后整文件删除，
+ * 由 ArchiveBanner 改从接口取 PostSummary[] 替代。
+ * cover 故意两种状态都有：非 null 跑图片分支，null 跑占位分支。
+ * published_at 一律完整 ISO datetime（YYYY-MM-DDThh:mm:ss），
+ * 中枢链路视图的整行时间戳直接取自它。
+ */
+export const TEST_POSTS: PostSummary[] = [
+  {
+    id: "t-001",
+    slug: "cpp-coroutine-notes",
+    title: "C++ 协程从语法到调度",
+    excerpt: "promise_type 不是玄学，把它拆开看每一步都做了什么。",
+    cover: "/images/backgrounds/01.jpg",
+    tags: ["C++", "学习", "后端"],
+    published_at: "2026-07-15T21:04:37",
+    reading_minutes: 12,
+    featured: false,
+  },
+  {
+    id: "t-002",
+    slug: "work-retro-quarterly",
+    title: "季度复盘：慢下来的三个月",
+    excerpt: "进度条没走多远，但把地基重新打了一遍。",
+    cover: null,
+    tags: ["工作", "随笔"],
+    published_at: "2026-04-02T09:12:03",
+    reading_minutes: 6,
+    featured: false,
+  },
+  {
+    id: "t-003",
+    slug: "nextjs-image-pitfalls",
+    title: "next/image 的那些坑",
+    excerpt: "fill、sizes、priority 三个参数组合起来的隐藏规则。",
+    cover: "/images/backgrounds/02.jpg",
+    tags: ["Next.js", "前端", "学习"],
+    published_at: "2026-09-20T16:45:22",
+    reading_minutes: 9,
+    featured: false,
+  },
+  {
+    id: "t-004",
+    slug: "study-method-notes",
+    title: "学习笔记该记成什么样",
+    excerpt: "抄板书不如写问题，回顾时才知道该从哪里想起。",
+    cover: null,
+    tags: ["学习", "方法"],
+    published_at: "2025-11-08T11:30:58",
+    reading_minutes: 5,
+    featured: false,
+  },
+  {
+    id: "t-005",
+    slug: "fastapi-background-tasks",
+    title: "FastAPI 后台任务的第一版写法",
+    excerpt: "BackgroundTasks 够用，但边界在哪要提前想清楚。",
+    cover: "/images/backgrounds/03.jpg",
+    tags: ["Python", "FastAPI", "工作"],
+    published_at: "2025-06-27T08:05:11",
+    reading_minutes: 8,
+    featured: false,
+  },
+  {
+    id: "t-006",
+    slug: "fastapi-background-tasks-2",
+    title: "FastAPI 后台任务的第一版写法",
+    excerpt: "BackgroundTasks 够用，但边界在哪要提前想清楚。",
+    cover: "/images/backgrounds/03.jpg",
+    tags: ["Python", "FastAPI", "工作"],
+    published_at: "2025-06-27T09:17:42",
+    reading_minutes: 8,
+    featured: false,
+  },
+  {
+    id: "t-007",
+    slug: "fastapi-background-tasks-3",
+    title: "FastAPI 后台任务的第一版写法",
+    excerpt: "BackgroundTasks 够用，但边界在哪要提前想清楚。",
+    cover: "/images/backgrounds/03.jpg",
+    tags: ["Python", "FastAPI", "工作"],
+    published_at: "2025-06-27T10:26:03",
+    reading_minutes: 8,
+    featured: false,
+  },
+  {
+    id: "t-008",
+    slug: "fastapi-background-tasks-4",
+    title: "FastAPI 后台任务的第一版写法",
+    excerpt: "BackgroundTasks 够用，但边界在哪要提前想清楚。",
+    cover: "/images/backgrounds/03.jpg",
+    tags: ["Python", "FastAPI", "工作"],
+    published_at: "2025-06-27T11:34:56",
+    reading_minutes: 8,
+    featured: false,
+  },
+  {
+    id: "t-009",
+    slug: "fastapi-background-tasks-5",
+    title: "FastAPI 后台任务的第一版写法",
+    excerpt: "BackgroundTasks 够用，但边界在哪要提前想清楚。",
+    cover: "/images/backgrounds/03.jpg",
+    tags: ["Python", "FastAPI", "工作"],
+    published_at: "2025-06-27T13:02:19",
+    reading_minutes: 8,
+    featured: false,
+  },
+  {
+    id: "t-010",
+    slug: "fastapi-background-tasks-6",
+    title: "FastAPI 后台任务的第一版写法",
+    excerpt: "BackgroundTasks 够用，但边界在哪要提前想清楚。",
+    cover: "/images/backgrounds/03.jpg",
+    tags: ["Python", "FastAPI", "工作"],
+    published_at: "2025-06-27T14:48:07",
+    reading_minutes: 8,
+    featured: false,
+  },
+  {
+    id: "t-011",
+    slug: "fastapi-background-tasks-7",
+    title: "FastAPI 后台任务的第一版写法",
+    excerpt: "BackgroundTasks 够用，但边界在哪要提前想清楚。",
+    cover: "/images/backgrounds/03.jpg",
+    tags: ["Python", "FastAPI", "工作"],
+    published_at: "2025-06-27T16:21:44",
+    reading_minutes: 8,
+    featured: false,
+  },
+  {
+    id: "t-012",
+    slug: "fastapi-background-tasks-8",
+    title: "FastAPI 后台任务的第一版写法",
+    excerpt: "BackgroundTasks 够用，但边界在哪要提前想清楚。",
+    cover: "/images/backgrounds/03.jpg",
+    tags: ["Python", "FastAPI", "工作"],
+    published_at: "2025-06-27T18:09:30",
+    reading_minutes: 8,
+    featured: false,
+  },
+  {
+    id: "t-013",
+    slug: "fastapi-background-tasks-9",
+    title: "FastAPI 后台任务的第一版写法",
+    excerpt: "BackgroundTasks 够用，但边界在哪要提前想清楚。",
+    cover: "/images/backgrounds/03.jpg",
+    tags: ["Python", "FastAPI", "工作"],
+    published_at: "2025-06-27T20:53:16",
+    reading_minutes: 8,
+    featured: false,
+  },
+];
+
+/** 「不过滤任何文章」的伪标签，不参与数据派生，永远排在标签栏首位 */
+export const ALL_TAG = "全部档案";
+
+/** 归档页全量标签：ALL_TAG + 文章标签去重（保持首次出现顺序） */
+export const ARCHIVE_TAGS: string[] = [
+  ALL_TAG,
+  ...new Set(TEST_POSTS.flatMap((post) => post.tags)),
+];

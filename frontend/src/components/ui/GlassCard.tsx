@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/format";
 
@@ -30,6 +30,8 @@ interface GlassCardProps {
   /** 是否启用 hover 抬升反馈（可点击的卡片才需要） */
   interactive?: boolean;
   className?: string;
+  /** 透传给容器节点的行内样式（如归档卡片错峰入场用的 --i 变量） */
+  style?: CSSProperties;
 }
 
 /**
@@ -45,6 +47,7 @@ export function GlassCard({
   padding = "md",
   interactive = false,
   className,
+  style,
 }: GlassCardProps) {
   return (
     <Tag
@@ -55,6 +58,7 @@ export function GlassCard({
         interactive && "glass-interactive",
         className,
       )}
+      style={style}
     >
       {children}
     </Tag>

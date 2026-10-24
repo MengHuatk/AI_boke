@@ -22,6 +22,13 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: "ZCOOL XiaoWe";
+  src: url("/font/ZiHunSongKeKaiTi-W4(ShangYongXuShouQuan)-2.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 @theme {
   /* ---------- 字体 ---------- */
@@ -30,6 +37,8 @@
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
   /* 弹幕层用（消费方 DanMu.tsx 的 font-danmu），回退走全站正文字体 */
   --font-danmu: "ZCOOL KuaiLe", var(--font-sans);
+  /* 归档卡片标题/简介用（消费方 ArchiveCard.tsx 的 font-xiaowei） */
+  --font-xiaowei: "ZCOOL XiaoWe", var(--font-sans);
 
   /* ---------- 圆角 ---------- */
   --radius-glass: 1.25rem;
@@ -169,6 +178,30 @@
   }
   to {
     transform: translate3d(-100%, 0, 0);
+  }
+}
+
+/* 归档视图切换入场（挂载一次性播放）：容器整块缓慢淡入用 view-fade，
+   其内每张卡片 / 每行错峰自下而上升起用 view-rise。位移固定 40px，
+   错峰档位经 --i 由组件逐个注入（节奏数值在下方配方段）。
+   消费方是 ArchiveGrid / HubTimeline / ArchiveCard */
+@keyframes view-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes view-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -332,6 +365,23 @@
 }
 
 /* ==========================================================================
+   归档视图切换入场配方（ArchiveGrid / HubTimeline 共用）
+   挂载时播放一次：根节点 view-fade 整块缓慢淡入，其内每张卡片 / 每行
+   view-rise 按 DOM 序（从左到右、从上到下）错峰自下而上升起、渐显。
+   「中等速度」落在这一组数值：单卡 450ms、一峰 70ms、容器 1s；
+   both 是必须的——延迟期间卡片要停在隐形初态，不能先闪现再升。
+   ========================================================================== */
+
+.view-fade {
+  animation: view-fade 1s ease both;
+}
+
+.view-rise {
+  animation: view-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* ==========================================================================
    无障碍：尊重系统的「减少动态效果」设置
    ========================================================================== */
 
@@ -346,5 +396,12 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* 切换入场要整条显式摘掉：时长护栏管不到 animation-delay，
+     只压时长的话卡片会先静默一秒多、再逐一瞬间闪现，反而更晃眼 */
+  .view-fade,
+  .view-rise {
+    animation: none;
   }
 }

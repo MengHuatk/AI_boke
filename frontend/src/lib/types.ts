@@ -46,7 +46,7 @@ export interface PostSummary {
   excerpt: string;
   cover: string | null;
   tags: string[];
-  /** ISO 日期字符串，如 "2026-09-28" */
+  /** ISO 日期时间字符串，如 "2026-09-28T14:05:09" */
   published_at: string;
   reading_minutes: number;
   featured: boolean;
