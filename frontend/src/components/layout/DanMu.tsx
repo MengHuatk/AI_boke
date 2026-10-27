@@ -30,24 +30,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 /** 弹幕库。想换文案只改这个数组，博客内不提供切换入口 */
 const DANMU_TEXTS: readonly string[] = [
-  "吾名正邪，生来即是天邪鬼！",
-  "优雅乃高贵之证。",
-  "医生的存在就是为了拯救痛苦的生命。",
-  "幻想基于真实，真实引领幻想。",
-  "地狱的存在并不是为了给人以惩罚。地狱是为了让生者从最初就不要背负罪孽而存在的。",
-  "试图从什么东西那里逃走的人就是犯下了罪孽的人。试图在哪里藏身的人就是承认了自身罪孽的人。然后，承认了自身罪孽的犯罪者，将会开始狡辩呢。",
-  "最最可怕的毒，就是一点一点的侵蚀身体的毒，侵蚀精神的毒。",
-  "所谓信仰，也就是对其物的存在心生敬意，为己身免于遭惩心怀畏惧，是令生命，精神，身体都得到升华的象征。",
-  "真正的恐怖，存在于约定俗成的恐怖之外。",
-  "忘记成佛的亡灵无法诞生出新的生命。不会死亡的人类无法知晓色彩鲜明的冥界。生生生生暗生始死死死死冥死终。",
-  "真相用眼睛是看不见的，用耳朵是听不到的，真相是通过斩而得知的。师傅曾经这么告诉过我。所以，一切不斩就无法开始。剑会引导我发现真相。",
-  "清流の清濁はその源にある",
-  "泰山は土壌を譲らず",
-  "以天制大地，以地除要枢",
-  "纵使只有一线蛛丝，也可籍此找到极乐的境界。",
-  "所谓历史，就是在寻常的时候让时间前进，在非同寻常的时候将时间的前进状态记录下来的东西。",
-  "完美潇洒の女仆",
-  "全人类の绯想天",
   "一辈子、和我一起组乐队吗?",
   "如果在感受悲伤前 能先收集泪水准备好的话 我心想不知道这样该有多好",
   "好想成为人",
@@ -127,7 +109,7 @@ const RANGE = {
   countSpan: 6,
   /** 轨道区间上下界，占本层高度的百分比 */
   topMin: 50,
-  topMax: 84,
+  topMax: 144,
   durationMin: 10,
   durationMax: 29,
   /** 开局把各条出生时刻铺开到的总时长，s */
@@ -232,13 +214,13 @@ export function DanMu() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-x-0 top-0 z-[-3] hidden h-1/3 overflow-hidden lg:block"
+      className="pointer-events-none fixed inset-x-0 top-0 z-[-3] hidden h-1/3 lg:block"
     >
       {items.map((danmu) => (
         <span
           key={danmu.id}
           onAnimationEnd={() => handleExited(danmu)}
-          className="absolute left-0 whitespace-nowrap font-danmu text-[20px] leading-none text-white/25"
+          className="absolute left-0 whitespace-nowrap font-danmu text-[20px] leading-none text-white/15"
           style={{
             top: `${danmu.top}px`,
             animation: `danmu-drift ${danmu.duration}s linear forwards`,

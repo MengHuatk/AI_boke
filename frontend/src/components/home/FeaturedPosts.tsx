@@ -13,7 +13,7 @@ interface FeaturedPostsProps {
  */
 export function FeaturedPosts({ posts }: FeaturedPostsProps) {
   return (
-    <GlassCard as="section" padding="lg" className="animate-fade-up">
+    <GlassCard as="section" padding="lg">
       <SectionHeading
         eyebrow="Featured"
         title="精选文章"

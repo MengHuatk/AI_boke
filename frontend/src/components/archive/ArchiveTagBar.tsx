@@ -5,7 +5,7 @@ import { ALL_TAG } from "@/lib/archive-fixtures";
 import { cn } from "@/lib/format";
 
 /** 归档显示模式：grid = 矩形网格（ArchiveGrid），hub = 中枢链路（HubTimeline）。 */
-export type ArchiveViewMode = "hub" | "grid";
+export type ArchiveViewMode = "grid" | "hub";
 
 const VIEW_MODES = [
   { key: "hub", label: "中枢链路", icon: "link" },

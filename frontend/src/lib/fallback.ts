@@ -8,7 +8,7 @@
  *    不要把这里当成第二份内容源来维护。
  */
 
-import type { HomePayload } from "@/lib/types";
+import type { HomePayload, PostDetail } from "@/lib/types";
 
 export const fallbackHome: HomePayload = {
   site: {
@@ -102,4 +102,53 @@ export const fallbackHome: HomePayload = {
     words: 1208,
     since: 2026,
   },
+};
+
+/**
+ * 单篇文章正文的兜底：与首页同套路——后端没起、或归档 fixture
+ * 的虚构 slug 撞进来时，文章页依然完整可读。
+ *
+ * body 特意带上 h2/h3、代码块与列表，够当目录盒、段落盒渲染的活教材。
+ */
+export const fallbackPostDetail: PostDetail = {
+  id: "demo-post",
+  slug: "terminal-log-gardening",
+  title: "在终端日志里种花：一次面向过去的园艺",
+  excerpt: "把废弃的运行时日志翻成土壤记录，让三千行报错开出第一篇园艺笔记。",
+  cover: "/images/backgrounds/01.jpg",
+  tags: ["随笔", "终端", "复盘"],
+  published_at: "2026-09-20T21:34:07",
+  reading_minutes: 6,
+  featured: false,
+  body: `## 起点：一份没人读的遗书
+
+三年前的那次断电事故，把一整台开发机的运行时状态冻在了几千行终端日志里。当时只顾着抢救数据，等三个月后回头看，那些报错信息反倒成了最诚实的日记——不是我们想成为的样子，而是我们当时真实的样子。
+
+## 工具与选型
+
+园艺先松土。解析这份日志，只需要三件趁手工具：
+
+- **解析层**：逐行状态机，够笨也够快，任何一行坏了都不拖垮下一行
+- **存储层**：SQLite，单文件，好埋也好挖
+- **渲染层**：\`react-markdown\` 加 \`remark-gfm\`，写完即所见
+
+### 一个更小的插曲
+
+状态机写到第七天的时候，我们发现日志里有 0.3% 的行是 UTF-8 半截字符。修不修？修了。这就是所谓花园里捉虫。
+
+## 落地的样子
+
+松土、播种、浇水，三步之内数据就该冒头：
+
+\`\`\`ts
+const soil = parseLogs(raw, { tolerant: true });
+const bed = soil.byDay();
+plot(bed, { into: "garden.svg", palette: "dusk" });
+\`\`\`
+
+跑通那一晚，图渲染出来的第一帧，所有人都安静了几秒——三千行报错，最后开出了一朵灰蓝色的、有点歪的花。
+
+## 尾声
+
+面向过去做园艺，修剪的是自己的记忆，施肥的是后来的工程习惯。日志会过期，但土壤永远留得住下一粒种子。`,
 };

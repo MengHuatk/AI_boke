@@ -9,6 +9,8 @@ import type { PostSummary } from "@/lib/types";
 
 interface HubTimelineProps {
   posts: PostSummary[];
+  /** 用户主动切换视图时播错峰入场；路由首访交给 ViewTransition */
+  animateEntrance?: boolean;
 }
 
 /**
@@ -23,17 +25,30 @@ interface HubTimelineProps {
  *
  * 数据由外层传入并按选中标签过滤，卡片序沿用传入序
  * （fixture 已是新→旧），左右交替只看下标奇偶、不额外排序。
+ *
+ * animateEntrance 只在用户主动切换视图时为 true；路由首访不播，
+ * 否则新页快照会拍到透明初态。
  */
-export function HubTimeline({ posts }: HubTimelineProps) {
+export function HubTimeline({ posts, animateEntrance = true }: HubTimelineProps) {
   return (
     /* 784 = 360×2 + 64（中缝），两列各 360 正好容下一张卡 */
-    <ol className="view-fade relative mx-auto flex w-[784px] max-w-full flex-col gap-10 pb-10">
+    <ol
+      className={cn(
+        "relative mx-auto flex w-[784px] max-w-full flex-col gap-10 pb-10",
+        animateEntrance && "view-fade",
+      )}
+    >
       <div
         aria-hidden
         className="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 rounded-full bg-linear-to-b from-transparent via-neon-600/80 to-transparent"
       />
       {posts.map((post, index) => (
-        <HubRow key={post.id} post={post} index={index} />
+        <HubRow
+          key={post.id}
+          post={post}
+          index={index}
+          animateEntrance={animateEntrance}
+        />
       ))}
     </ol>
   );
@@ -48,11 +63,22 @@ export function HubTimeline({ posts }: HubTimelineProps) {
  * 节点与连线的 top-[210px] 不是拍脑袋——对齐的是卡片信息区里
  * 时间行的垂直中线：图片 192 + 信息区上内边距 12 + 半行文字 6。
  */
-function HubRow({ post, index }: { post: PostSummary; index: number }) {
+function HubRow({
+  post,
+  index,
+  animateEntrance,
+}: {
+  post: PostSummary;
+  index: number;
+  animateEntrance: boolean;
+}) {
   const left = index % 2 === 0;
   return (
     <li
-      className="view-rise relative grid grid-cols-2 gap-x-16"
+      className={cn(
+        "relative grid grid-cols-2 gap-x-16",
+        animateEntrance && "view-rise",
+      )}
       style={{ "--i": index } as CSSProperties}
     >
       {/* 光点节点：垫在中轴上，压在细线之上 */}

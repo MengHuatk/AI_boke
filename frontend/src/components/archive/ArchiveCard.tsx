@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Icon } from "@/components/ui/Icon";
 import { SmartLink } from "@/components/ui/SmartLink";
+import { cn } from "@/lib/format";
 import type { PostSummary } from "@/lib/types";
 
 interface ArchiveCardProps {
@@ -12,6 +13,8 @@ interface ArchiveCardProps {
   index: number;
   /** 文章列表页的路由前缀，与 PostCard 保持同一约定 */
   basePath?: string;
+  /** 用户主动切换视图时播错峰入场；路由首访交给 ViewTransition */
+  animateEntrance?: boolean;
 }
 
 /**
@@ -31,9 +34,14 @@ interface ArchiveCardProps {
  * 随标签长度伸展。
  *
  * 视图切换时随 grid 整块缓慢淡入，自身再按 index 档位错峰自下而上
- * 升起渐显（view-rise 配方见 globals.css）。
+ * 升起渐显（view-rise 配方见 globals.css）。路由首访不播，交给整页过渡。
  */
-export function ArchiveCard({ post, index, basePath = "/posts" }: ArchiveCardProps) {
+export function ArchiveCard({
+  post,
+  index,
+  basePath = "/posts",
+  animateEntrance = true,
+}: ArchiveCardProps) {
   const href = `${basePath}/${post.slug}`;
 
   return (
@@ -41,7 +49,10 @@ export function ArchiveCard({ post, index, basePath = "/posts" }: ArchiveCardPro
       as="li"
       padding="none"
       interactive
-      className="group view-rise w-[288px] h-[372px] overflow-hidden"
+      className={cn(
+        "group w-[288px] h-[372px] overflow-hidden",
+        animateEntrance && "view-rise",
+      )}
       style={{ "--i": index } as CSSProperties}
     >
       {/* 整卡可点，与 PostCard 同样的热区处理 */}

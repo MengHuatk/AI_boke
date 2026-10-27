@@ -10,7 +10,7 @@
  */
 
 import { apiConfig, uiConfig } from "@/lib/config";
-import { fallbackHome } from "@/lib/fallback";
+import { fallbackHome, fallbackPostDetail } from "@/lib/fallback";
 import type {
   DataResult,
   HomePayload,
@@ -123,4 +123,9 @@ export async function getHomeData(): Promise<DataResult<HomePayload>> {
 /** 站点配置。导航栏与页脚依赖它，因此同样需要降级。 */
 export async function getSite(): Promise<DataResult<SiteConfig>> {
   return withFallback(fetchSite, fallbackHome.site, "站点配置");
+}
+
+/** 单篇文章正文。后端不可用或 slug 不存在时退回示例文章。 */
+export async function getPost(slug: string): Promise<DataResult<PostDetail>> {
+  return withFallback(() => fetchPost(slug), fallbackPostDetail, "文章详情");
 }

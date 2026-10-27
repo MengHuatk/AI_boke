@@ -18,7 +18,7 @@ interface HeroSectionProps {
  */
 export function HeroSection({ profile, stats }: HeroSectionProps) {
   return (
-    <GlassCard padding="lg" className="animate-fade-up">
+    <GlassCard padding="lg">
       <div className="flex flex-col gap-7 sm:flex-row sm:items-start sm:gap-8">
         {/* 头像 */}
         <div className="relative shrink-0">

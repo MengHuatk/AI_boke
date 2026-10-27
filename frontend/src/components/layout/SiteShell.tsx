@@ -39,7 +39,10 @@ export async function SiteShell({ children }: SiteShellProps) {
 
       <Navbar site={site} />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
+      {/* 首屏入场只在 main 上播一次：main 在站内导航中不会重建，
+          所以不会和 app/template.tsx 的 ViewTransition 重复播放。
+          配方见 globals.css 的「路由切换过渡」段。 */}
+      <main className="route-enter-initial mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
         {children}
       </main>
 

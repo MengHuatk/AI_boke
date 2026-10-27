@@ -1,8 +1,11 @@
 import { ArchiveCard } from "@/components/archive/ArchiveCard";
+import { cn } from "@/lib/format";
 import type { PostSummary } from "@/lib/types";
 
 interface ArchiveGridProps {
   posts: PostSummary[];
+  /** 用户主动切换视图时播错峰入场；路由首访交给 ViewTransition */
+  animateEntrance?: boolean;
 }
 
 /**
@@ -18,13 +21,25 @@ interface ArchiveGridProps {
  *
  * 视图切换挂载时整块缓慢淡入（view-fade），卡片再按 DOM 序
  * （从左到右、从上到下）逐张错峰升起（view-rise，见 globals.css）。
+ * animateEntrance 只在用户主动切换视图时为 true；路由首访不播，
+ * 否则新页快照会拍到透明初态。
  */
-export function ArchiveGrid({ posts }: ArchiveGridProps) {
+export function ArchiveGrid({ posts, animateEntrance = true }: ArchiveGridProps) {
   return (
-    <div className="archive-scroll view-fade min-h-0 w-full max-w-[944px] flex-1 overflow-y-auto">
+    <div
+      className={cn(
+        "archive-scroll min-h-0 w-full max-w-[944px] flex-1 overflow-y-auto",
+        animateEntrance && "view-fade",
+      )}
+    >
       <ul className="grid grid-cols-3 justify-items-center gap-6">
         {posts.map((post, index) => (
-          <ArchiveCard key={post.id} post={post} index={index} />
+          <ArchiveCard
+            key={post.id}
+            post={post}
+            index={index}
+            animateEntrance={animateEntrance}
+          />
         ))}
       </ul>
     </div>

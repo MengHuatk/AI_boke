@@ -243,6 +243,26 @@
     0 16px 44px -18px rgb(2 6 23 / 0.75);
 }
 
+/* 厚玻璃：文章正文长容器（PostArticle），三档玻璃里最厚的一档。
+   长文会长时间贴着漂动的背景滚动，底色再压深、模糊再加重一档，
+   文字才始终立在实处 */
+@utility glass-panel-thick {
+  background-color: rgb(10 12 28 / 0.66);
+  background-image: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 0.1) 0%,
+    rgb(255 255 255 / 0.03) 50%,
+    rgb(255 255 255 / 0.06) 100%
+  );
+  backdrop-filter: blur(calc(var(--blur-glass-heavy) * 1.4)) saturate(190%);
+  -webkit-backdrop-filter: blur(calc(var(--blur-glass-heavy) * 1.4)) saturate(190%);
+  border: 1px solid rgb(255 255 255 / 0.16);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.22),
+    inset 0 -1px 0 0 rgb(255 255 255 / 0.05),
+    0 24px 60px -24px rgb(2 6 23 / 0.85);
+}
+
 /* 顶部导航专用：通栏无圆角，底色比加强玻璃再深一档，保证压住轮播背景 */
 @utility glass-panel-nav {
   background-color: rgb(6 8 18 / 0.6);
@@ -365,6 +385,38 @@
 }
 
 /* ==========================================================================
+   淡蓝紫滚动条（ArchiveSearch 的结果盒、PostToc 的目录盒共用）
+   与 .archive-scroll 同一家配方，颜色反过来：深黑蓝结果盒上要用
+   淡蓝紫亮条才跳得出来，hover / 拖动再提亮一档。
+   ========================================================================== */
+
+.archive-lookup-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #9aa5ff transparent;
+}
+
+.archive-lookup-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.archive-lookup-scroll::-webkit-scrollbar-thumb {
+  background-color: #9aa5ff;
+  /* 2px 透明边 + padding-box：把滑块裁成比槽位窄一圈的圆条，两端呈胶囊状 */
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+.archive-lookup-scroll::-webkit-scrollbar-thumb:hover,
+.archive-lookup-scroll::-webkit-scrollbar-thumb:active {
+  background-color: #b9c1ff;
+}
+
+.archive-lookup-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ==========================================================================
    归档视图切换入场配方（ArchiveGrid / HubTimeline 共用）
    挂载时播放一次：根节点 view-fade 整块缓慢淡入，其内每张卡片 / 每行
    view-rise 按 DOM 序（从左到右、从上到下）错峰自下而上升起、渐显。
@@ -379,6 +431,62 @@
 .view-rise {
   animation: view-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* ==========================================================================
+   路由切换过渡（View Transitions）
+   站内导航：template.tsx 把页面内容包进 <ViewTransition>，浏览器拍下
+   旧页/新页两张快照——旧页快速淡出，新页缓慢自下而上升起。
+   首屏没有旧页可交叉，由 .route-enter-initial 在 main 上播一次；
+   main 在站内导航中不重建，所以不会和 ViewTransition 重复播放。
+
+   注意：页面内容里不要再放“挂载即播放”的 opacity 入场。View Transitions
+   拍新页快照的时机在动画第 0 帧，带透明度初态的组件会被拍成透明，
+   过渡结束后才在实时 DOM 里补播一遍。
+   ========================================================================== */
+
+@keyframes route-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes route-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.route-enter-initial {
+  animation: route-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* 根快照负责在过渡期间把外壳（导航栏、背景、弹幕、页脚）画出来。
+   这里不让 root 做动画，只让页面内容组做淡入上浮——root 必须留在
+   快照里，不能设成 view-transition-name: none，否则外壳在过渡期间
+   没有任何画面接管会直接消失。外壳会在这 0.7s 内保持过渡开始时的
+   静态画面，这是 View Transitions 的固有代价。 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-old(.route-out) {
+  animation: route-fade-out 0.18s ease-in both;
+}
+
+::view-transition-new(.route-in) {
+  animation: route-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* 过渡期间让点击穿透，别把整页锁死 0.7s */
+::view-transition {
+  pointer-events: none;
 }
 
 /* ==========================================================================
@@ -401,7 +509,17 @@
   /* 切换入场要整条显式摘掉：时长护栏管不到 animation-delay，
      只压时长的话卡片会先静默一秒多、再逐一瞬间闪现，反而更晃眼 */
   .view-fade,
-  .view-rise {
+  .view-rise,
+  .route-enter-initial {
     animation: none;
+  }
+
+  /* View Transitions 的伪元素不在上方通配符的覆盖范围内，单独压掉；
+     组也一起压，避免组尺寸/位置还在插值 */
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }
