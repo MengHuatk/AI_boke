@@ -103,7 +103,7 @@ export function ArchiveCard({
               {post.tags.map((tag) => (
                 <li
                   key={tag}
-                  className="glass-panel inline-flex h-[21px] min-w-[40px] items-center justify-center rounded-[4px] px-1 text-[10px] leading-none whitespace-nowrap text-[#906eff] p-[10px] "
+                  className="glass-panel-thick  inline-flex h-[21px] min-w-[40px] items-center justify-center rounded-[4px] px-1 text-[10px] leading-none whitespace-nowrap text-[#906eff] p-[10px] "
                 >
                   #{tag}
                 </li>

@@ -29,6 +29,16 @@
   font-style: normal;
   font-display: swap;
 }
+/* 音乐页左右两盒专用：微软雅黑。
+   和上面两款一样走 public 直引，不额外进 next/font 管线；
+   只声明 400，盒内的 font-medium / font-semibold 由浏览器合成粗体 */
+@font-face {
+  font-family: "YaHei Web";
+  src: url("/font/RocknRollOne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 @theme {
   /* ---------- 字体 ---------- */
@@ -39,6 +49,8 @@
   --font-danmu: "ZCOOL KuaiLe", var(--font-sans);
   /* 归档卡片标题/简介用（消费方 ArchiveCard.tsx 的 font-xiaowei） */
   --font-xiaowei: "ZCOOL XiaoWe", var(--font-sans);
+  /* 音乐页左右两盒用（消费方 MusicPlayer / MusicRightPanel 的 font-yahei） */
+  --font-yahei: "YaHei Web", "Microsoft YaHei", var(--font-sans);
 
   /* ---------- 圆角 ---------- */
   --radius-glass: 1.25rem;
@@ -212,19 +224,25 @@
 
 /* 标准玻璃面板：首页卡片默认用这个 */
 @utility glass-panel {
+ background-color: rgb(35 40 56 / 0.55);
+  
+  /* 2. 背景叠加：非常微弱的左上到右下的白色高光，模拟玻璃表面 */
   background-image: linear-gradient(
     145deg,
-    rgb(47 48 110 / 0.1) 0%,
-    rgb(47 48 110 / 0.04) 45%,
-    rgb(47 48 110 / 0.07) 100%
+    rgb(255 255 255 / 0.05) 0%,
+    transparent 40%,
+    transparent 100%
   );
-  backdrop-filter: blur(var(--blur-glass)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(160%);
-  border: 1px solid rgb(255 255 255 / 0.12);
-  box-shadow:
-    inset 0 1px 0 0 rgb(255 255 255 / 0.16),
-    inset 0 -1px 0 0 rgb(255 255 255 / 0.04),
-    0 10px 30px -12px rgb(2 6 23 / 0.6);
+
+  /* 3. 模糊度：保持高模糊，让背景的光晕散开，饱和度可以稍微提高一点点，让颜色更鲜艳 */
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+
+  /* 4. 边框：极其微弱，几乎不可见，只用来勾勒轮廓 */
+  border: 1px solid rgb(255 255 255 / 0.06);
+
+  /* 5. 阴影：只保留非常轻柔的外阴影，去掉内高光，因为它不需要那种厚重的 3D 感 */
+  box-shadow: 0 10px 40px -10px rgb(0 0 0 / 0.5);
 }
 
 /* 加强玻璃：用于需要更强可读性的悬浮层，如顶部导航 */
@@ -247,20 +265,26 @@
    长文会长时间贴着漂动的背景滚动，底色再压深、模糊再加重一档，
    文字才始终立在实处 */
 @utility glass-panel-thick {
-  background-color: rgb(10 12 28 / 0.66);
+   /* 1. 背景色：使用偏冷的深蓝灰，透明度提高到 55% 左右，让背景光透过来 */
+  background-color: rgb(35 40 56 / 0.55);
+  
+  /* 2. 背景叠加：非常微弱的左上到右下的白色高光，模拟玻璃表面 */
   background-image: linear-gradient(
     145deg,
-    rgb(255 255 255 / 0.1) 0%,
-    rgb(255 255 255 / 0.03) 50%,
-    rgb(255 255 255 / 0.06) 100%
+    rgb(255 255 255 / 0.05) 0%,
+    transparent 40%,
+    transparent 100%
   );
-  backdrop-filter: blur(calc(var(--blur-glass-heavy) * 1.4)) saturate(190%);
-  -webkit-backdrop-filter: blur(calc(var(--blur-glass-heavy) * 1.4)) saturate(190%);
-  border: 1px solid rgb(255 255 255 / 0.16);
-  box-shadow:
-    inset 0 1px 0 0 rgb(255 255 255 / 0.22),
-    inset 0 -1px 0 0 rgb(255 255 255 / 0.05),
-    0 24px 60px -24px rgb(2 6 23 / 0.85);
+
+  /* 3. 模糊度：保持高模糊，让背景的光晕散开，饱和度可以稍微提高一点点，让颜色更鲜艳 */
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+
+  /* 4. 边框：极其微弱，几乎不可见，只用来勾勒轮廓 */
+  border: 1px solid rgb(255 255 255 / 0.06);
+
+  /* 5. 阴影：只保留非常轻柔的外阴影，去掉内高光，因为它不需要那种厚重的 3D 感 */
+  box-shadow: 0 10px 40px -10px rgb(0 0 0 / 0.5);
 }
 
 /* 顶部导航专用：通栏无圆角，底色比加强玻璃再深一档，保证压住轮播背景 */
@@ -487,6 +511,23 @@
 /* 过渡期间让点击穿透，别把整页锁死 0.7s */
 ::view-transition {
   pointer-events: none;
+}
+
+/* ==========================================================================
+   音乐页：黑胶唱片旋转
+   播放时持续匀速旋转，暂停由 MusicPlayer 用行内 animation-play-state
+   停住（不重建节点，停在哪一帧就从哪一帧接着转）。
+   减少动态效果时由上方的通配规则统一压掉。
+   ========================================================================== */
+
+@keyframes vinyl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vinyl-spin {
+  animation: vinyl-spin 16s linear infinite;
 }
 
 /* ==========================================================================

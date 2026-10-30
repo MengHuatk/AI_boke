@@ -16,7 +16,7 @@ export function PostToc({ headings }: { headings: HeadingEntry[] }) {
   return (
     <nav
       aria-label="正文目录"
-      className="glass-panel flex h-[238px] w-full shrink-0 flex-col gap-2 rounded-glass px-5 py-4"
+      className="glass-panel-thick flex h-[238px] w-full shrink-0 flex-col gap-2 rounded-glass px-5 py-4"
     >
       <span className="font-xiaowei text-[13px] text-white/60">目录</span>
       <ul className="archive-lookup-scroll flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto pr-1">

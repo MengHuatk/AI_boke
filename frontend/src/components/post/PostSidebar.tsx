@@ -30,7 +30,7 @@ export function PostSidebar({ profile, socials, related, headings }: PostSidebar
   return (
     <aside className="flex w-full flex-col gap-5 lg:w-[320px] lg:shrink-0">
       {/* 1 · 自我介绍：内容与首页 Hero 同源的浓缩版 */}
-      <div className="glass-panel flex h-[228.5px] w-full shrink-0 flex-col items-center justify-center gap-3 rounded-glass px-6">
+      <div className="glass-panel-thick flex h-[228.5px] w-full shrink-0 flex-col items-center justify-center gap-3 rounded-glass px-6">
    <div className="rounded-full bg-gradient-to-br from-[#5D4CC2] to-[#A656DB] p-[4px] transition-all duration-600 hover:rotate-10 ">
   <Image
     src={profile.avatar}
@@ -60,7 +60,7 @@ export function PostSidebar({ profile, socials, related, headings }: PostSidebar
       </div>
 
       {/* 2 · 正在播放：占位盒，播放器接入后填充 */}
-      <div className="glass-panel flex h-[210px] w-full shrink-0 flex-col gap-3 rounded-glass px-6 py-5">
+      <div className="glass-panel-thick flex h-[210px] w-full shrink-0 flex-col gap-3 rounded-glass px-6 py-5">
         <span className="font-xiaowei text-[13px] text-white/60">正在播放</span>
         <div aria-hidden className="flex flex-1 items-center justify-center gap-1.5">
           {[18, 30, 24, 36, 18, 30, 24, 32, 20].map((bar, i) => (
@@ -75,7 +75,7 @@ export function PostSidebar({ profile, socials, related, headings }: PostSidebar
       </div>
 
       {/* 3 · 其他文档：三篇标题一行、时间一行 */}
-      <div className="glass-panel flex h-[235px] w-full shrink-0 flex-col rounded-glass px-6 py-5">
+      <div className="glass-panel-thick flex h-[235px] w-full shrink-0 flex-col rounded-glass px-6 py-5">
         <span className="font-xiaowei text-[13px] text-white/60">其他文档</span>
         <div className="flex min-h-0 flex-1 flex-col justify-evenly">
           {related.map((item) => (
