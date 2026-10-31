@@ -149,7 +149,7 @@ export function MiniMusicPlayer() {
       </span>
 
       {/* 歌名在上、当前歌词在下 */}
-      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 font-yahei">
         <p className="truncate text-[12px] leading-none font-medium text-white">
           {track.title}
         </p>
@@ -165,7 +165,7 @@ export function MiniMusicPlayer() {
           onClick={togglePlay}
           aria-label={playing ? "暂停" : "播放"}
           title={playing ? "暂停" : "播放"}
-          className="grid size-8 shrink-0 cursor-pointer place-items-center rounded-full bg-white/10 text-white transition-colors duration-200 hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
+          className="grid size-8 shrink-0 cursor-pointer place-items-center rounded-full bg-[#5D00FF] text-white transition-colors duration-200 hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
         >
           <Icon name={playing ? "pause" : "play"} size={14} />
         </button>

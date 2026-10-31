@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { MiniMusicPlayer } from "@/components/music/MiniMusicPlayer";
 import { MusicProvider } from "@/components/music/MusicProvider";
+import { MusicRain } from "@/components/music/MusicRain";
 import { getSite } from "@/lib/api";
 import { uiConfig } from "@/lib/config";
 
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full">
         <MusicProvider>
           <SiteShell>{children}</SiteShell>
+          <MusicRain />
           <MiniMusicPlayer />
         </MusicProvider>
       </body>

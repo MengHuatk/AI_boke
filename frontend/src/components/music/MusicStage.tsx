@@ -3,7 +3,6 @@
 import { MusicComments } from "@/components/music/MusicComments";
 import { MusicPlayer } from "@/components/music/MusicPlayer";
 import { useMusic } from "@/components/music/MusicProvider";
-import { MusicRain } from "@/components/music/MusicRain";
 import { MusicRightPanel } from "@/components/music/MusicRightPanel";
 
 /**
@@ -21,7 +20,7 @@ import { MusicRightPanel } from "@/components/music/MusicRightPanel";
  *
  * 播放状态和唯一的 <audio> 都在根布局的 MusicProvider 里，
  * 这里只消费状态，所以离开音乐页后音乐继续播放；
- * 播放时由 MusicRain 在 body 上挂一层全屏雨幕，雨势随进度变大。
+ * 全屏雨幕同样在根布局，播放期间全站都会下雨。
  */
 export function MusicStage() {
   const {
@@ -44,9 +43,6 @@ export function MusicStage() {
 
   return (
     <section className="relative left-1/2 flex w-[1200px] max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-col gap-8">
-      {/* 播放时从视口落下淡白雨幕；暂停后由组件自己淡出 */}
-      <MusicRain playing={playing} elapsed={elapsed} duration={duration} />
-
       {/* 标题区：贴 1200px 面板左侧 */}
       <header className="flex flex-col gap-3">
         <h1 className="text-5xl font-bold tracking-tight text-white sm:text-6xl xl:text-[64px]">

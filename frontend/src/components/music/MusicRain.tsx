@@ -4,12 +4,7 @@ import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 
 import { RainCanvas } from "@/components/music/RainCanvas";
-
-interface MusicRainProps {
-  playing: boolean;
-  elapsed: number;
-  duration: number;
-}
+import { useMusic } from "@/components/music/MusicProvider";
 
 /** 开始播放时整层淡入的时长 */
 const PLAY_FADE_SECONDS = 1.2;
@@ -39,6 +34,9 @@ function getServerMountedSnapshot() {
 /**
  * 播放时落下淡白雨滴，雨势随播放进度由小变大；暂停后整层淡出。
  *
+ * 由根布局挂载在 MusicProvider 内，所以站内切页不会中断下雨，
+ * 全站播放期间都会下雨；音乐页大播放器和迷你盒子共用同一份进度。
+ *
  * 雨滴由 RainCanvas 逐帧绘制：每颗雨滴的长度、粗细、速度、亮度都
  * 单独随机；播放进度越高，越过出现门槛的雨滴越多，雨势由疏到密。
  * 较近的雨滴落到视口底部时会溅起水花，雨势越密水花越多。
@@ -48,7 +46,8 @@ function getServerMountedSnapshot() {
  * 雨幕就只会盖住 1200px 面板，而不是整个视口。等服务端渲染结束后
  * 再 portal，浏览器里才有 document.body。
  */
-export function MusicRain({ playing, elapsed, duration }: MusicRainProps) {
+export function MusicRain() {
+  const { playing, elapsed, duration } = useMusic();
   const mounted = useSyncExternalStore(
     subscribeMounted,
     getMountedSnapshot,
