@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { SiteShell } from "@/components/layout/SiteShell";
+import { MiniMusicPlayer } from "@/components/music/MiniMusicPlayer";
+import { MusicProvider } from "@/components/music/MusicProvider";
 import { getSite } from "@/lib/api";
 import { uiConfig } from "@/lib/config";
 
@@ -43,7 +45,8 @@ export async function generateMetadata(): Promise<Metadata> {
 /**
  * 根布局。
  *
- * 只负责三件事：字体变量、全局样式、套上 SiteShell。
+ * 只负责字体变量、全局样式和站点外壳；播放状态放在
+ * MusicProvider 这一层，站内切页时不会卸载，音乐可以连续播放。
  * 页面本身不关心背景/导航/页脚，新增路由自动继承。
  */
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -53,7 +56,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <SiteShell>{children}</SiteShell>
+        <MusicProvider>
+          <SiteShell>{children}</SiteShell>
+          <MiniMusicPlayer />
+        </MusicProvider>
       </body>
     </html>
   );

@@ -6,8 +6,8 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/format";
 import {
+  findActiveLine,
   formatDuration,
-  type MusicLyricLine,
   type MusicTrack,
 } from "@/lib/music-fixtures";
 
@@ -48,16 +48,6 @@ interface MusicRightPanelProps {
   elapsed: number;
   onSelectTrack: (index: number) => void;
   onSeek: (seconds: number) => void;
-}
-
-/** 当前唱到第几行：最后一个 time ≤ elapsed 的行；还没到第一行时返回 -1 */
-function findActiveLine(lyrics: MusicLyricLine[], elapsed: number): number {
-  let active = -1;
-  for (let index = 0; index < lyrics.length; index += 1) {
-    if (lyrics[index].time > elapsed) break;
-    active = index;
-  }
-  return active;
 }
 
 /**

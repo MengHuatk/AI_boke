@@ -563,4 +563,9 @@
     animation-duration: 0s !important;
     animation-delay: 0s !important;
   }
+
+  /* 雨幕是纯装饰：减少动态效果下直接不显示 */
+  .music-rain {
+    display: none;
+  }
 }

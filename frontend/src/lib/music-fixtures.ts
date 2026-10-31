@@ -35,6 +35,19 @@ export function formatDuration(seconds: number): string {
   return `${minutes}:${rest.toString().padStart(2, "0")}`;
 }
 
+/** 当前唱到第几行：最后一个 time ≤ elapsed 的行；还没到第一行时返回 -1 */
+export function findActiveLine(
+  lyrics: MusicLyricLine[],
+  elapsed: number,
+): number {
+  let active = -1;
+  for (let index = 0; index < lyrics.length; index += 1) {
+    if (lyrics[index].time > elapsed) break;
+    active = index;
+  }
+  return active;
+}
+
 export const MUSIC_TRACKS: MusicTrack[] = [
   {
     id: "chun-ri-ying",
