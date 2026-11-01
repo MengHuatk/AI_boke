@@ -458,6 +458,43 @@
 }
 
 /* ==========================================================================
+   照片墙：拍立得照片堆
+   每一层白框照片的位置由 AlbumCard 逐层注入：--x / --y / --rot 是静止
+   位置，--hover-* 是鼠标移入后微微散开的位置。外层 .group 由卡片按钮
+   承担，键盘 focus-visible 同样触发，保证不用鼠标也能看到照片堆的层次。
+   ========================================================================== */
+
+.photo-stack-layer {
+  transform: translate(-50%, -50%) translate(var(--x, 0px), var(--y, 0px))
+    rotate(var(--rot, 0deg));
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.group:hover .photo-stack-layer,
+.group:focus-visible .photo-stack-layer {
+  transform: translate(-50%, -50%)
+    translate(var(--hover-x, 0px), var(--hover-y, 0px))
+    rotate(var(--hover-rot, 0deg));
+}
+
+/* 照片墙：画廊 ↔ 详情只在当前路由内替换照片集区，容器淡入并轻微上浮。
+   首访不播，整页入场仍交给 template.tsx 的 ViewTransition。 */
+@keyframes photo-swap-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.photo-swap {
+  animation: photo-swap-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ==========================================================================
    路由切换过渡（View Transitions）
    站内导航：template.tsx 把页面内容包进 <ViewTransition>，浏览器拍下
    旧页/新页两张快照——旧页快速淡出，新页缓慢自下而上升起。
@@ -551,7 +588,8 @@
      只压时长的话卡片会先静默一秒多、再逐一瞬间闪现，反而更晃眼 */
   .view-fade,
   .view-rise,
-  .route-enter-initial {
+  .route-enter-initial,
+  .photo-swap {
     animation: none;
   }
 

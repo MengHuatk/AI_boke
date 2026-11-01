@@ -80,6 +80,34 @@ export interface HomePayload {
   stats: SiteStats;
 }
 
+/**
+ * 单张照片。
+ *
+ * 照片集接入后端后，字段需与 backend 的照片接口保持一致；
+ * width / height 用于 next/image 计算比例，也让瀑布流在图片加载前
+ * 就能占住正确的高度。
+ */
+export interface PhotoItem {
+  id: string;
+  src: string;
+  alt: string;
+  /** 展示用照片名，详情页 hover 遮罩显示 */
+  title: string;
+  width: number;
+  height: number;
+}
+
+/** 照片集：画廊里的一个相册，包含若干张照片 */
+export interface PhotoAlbum {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  /** 创建日期，yyyy-mm-dd */
+  created_at: string;
+  photos: PhotoItem[];
+}
+
 /** 数据来源标记：来自后端接口，还是本地兜底数据 */
 export type DataSource = "api" | "fallback";
 
