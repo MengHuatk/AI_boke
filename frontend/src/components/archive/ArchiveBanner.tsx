@@ -63,7 +63,7 @@ export function ArchiveBanner() {
         isHub ? "pt-4" : "h-dvh rounded-glass pt-4 pb-10",
       )}
     >
-      <span className="text-[50px] font-bold">归档与探索</span>
+      <span className="text-[50px]  font-xiaowei">归档与探索</span>
 
       <ArchiveSearch posts={posts} />
 

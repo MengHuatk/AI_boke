@@ -36,27 +36,27 @@ export function AlbumDetail({ album, onBack }: AlbumDetailProps) {
         <button
           type="button"
           onClick={onBack}
-          className="glass-panel-subtle inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm text-white/65 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neon-500"
+          className="glass-panel inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm text-white/65 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neon-500"
         >
           <Icon name="arrowRight" size={14} className="rotate-180" />
           返回画廊
         </button>
 
         {/* 与返回按钮同排的创建日期胶囊 */}
-        <span className="glass-panel-subtle inline-flex h-8 items-center rounded-full px-3 text-xs text-white/50 tabular-nums">
+        <span className=" inline-flex h-8 items-center rounded-full px-3 text-[14px] text-white/50 tabular-nums">
           {album.created_at}
         </span>
       </div>
 
       <div className="mt-7 flex items-center justify-between gap-4">
-        <h2 className="min-w-0 font-xiaowei text-[30px] leading-tight text-white/90">
+        <h2 className="min-w-0 font-xiaowei text-[58px] leading-tight text-white/90">
           {album.title}
         </h2>
-        <span className="shrink-0 text-sm text-white/45">
-          · {album.photos.length} 张 ·
+        <span className="glass-panel px-4 py-3 rounded-[16px] shrink-0 text-[16px] text-white/45 font-yahei">
+          共 <span className="text-[#A18CFF] text-[18px]">{album.photos.length}</span> 瞬间
         </span>
       </div>
-      <p className="mt-3 max-w-3xl text-sm leading-7 text-white/55">
+      <p className=" max-w-3xl text-[16px] leading-7 text-white/45 font-yahei">
         {album.description}
       </p>
 

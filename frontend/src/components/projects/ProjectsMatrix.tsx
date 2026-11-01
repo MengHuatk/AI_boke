@@ -125,7 +125,7 @@ export function ProjectsMatrix({ projects }: ProjectsMatrixProps) {
       </SmartLink>
 
       <header className="flex flex-col gap-2">
-        <h1 className="text-[38px] leading-[1.1] font-bold text-white/95 sm:text-[50px]">
+        <h1 className="text-[38px] leading-[1.1] font-xiaowei text-white/95 sm:text-[50px]">
           Projects Matrix
         </h1>
         <p className="font-xiaowei text-[15px] text-white/50 sm:text-[16px]">

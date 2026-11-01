@@ -91,12 +91,19 @@ const ALBUM_OFFSETS = [
   "sm:mt-12 lg:mt-14",
 ];
 
+/** 封面白框宽度（px），内图宽度为它减去两侧白边 */
+const COVER_WIDTH = 260;
+
+/** 白边内边距（px），对应层上的 p-1.5 */
+const COVER_PADDING = 6;
+
 /**
  * 错落拍立得墙里的一组照片。
  *
  * 按 slug 从六套手作排布里稳定选一套，取照片集前四张做堆叠：
  * 主图居中，另外三张以不同的上下偏移和角度垫在周围。
- * 白框用 bg-white + padding 模拟相片纸。
+ * 白框用 bg-white + padding 模拟相片纸，内图按每张照片的真实宽高比
+ * 撑高，竖图明显更高、横图更扁，白框不再统一裁成 4:3。
  * hover / 键盘 focus 时由 globals.css 的 .photo-stack-layer 配方让四层
  * 微微散开；最上方主图同时放大 1.10，下半 50% 渐变遮罩整体淡入，
  * 张数与淡紫色的 Click to Open 从下方 10px 错峰上浮淡入。
@@ -121,6 +128,23 @@ export function AlbumCard({ album, index, onOpen }: AlbumCardProps) {
 
   const stackPhotos = album.photos.slice(0, preset.length);
 
+  // 白框宽度固定，内图按真实宽高比撑高，所以每层框高各不相同。四层都绕
+  // 容器中心旋转并带纵向偏移，容器高度取「旋转后最高的一层 + 纵向偏移」，
+  // 再乘整组缩放，竖图才不会压到下方的集名与简介。
+  const maxHalfHeight = Math.max(
+    ...stackPhotos.map((photo, layerIndex) => {
+      const layer = preset[layerIndex];
+      const frameHeight =
+        (COVER_WIDTH - COVER_PADDING * 2) * (photo.height / photo.width) +
+        COVER_PADDING * 2;
+      const radians = (Math.abs(layer.rot) * Math.PI) / 180;
+      const rotatedHalfHeight =
+        (frameHeight * Math.cos(radians) + COVER_WIDTH * Math.sin(radians)) / 2;
+      return rotatedHalfHeight + Math.abs(layer.y);
+    }),
+  );
+  const stackHeight = maxHalfHeight * 2 * scale + 16;
+
   return (
     <li className={cn("flex justify-center", offset)}>
       <button
@@ -128,10 +152,14 @@ export function AlbumCard({ album, index, onOpen }: AlbumCardProps) {
         onClick={() => onOpen(album)}
         className="group flex w-full max-w-[340px] cursor-pointer flex-col items-center gap-4 rounded-glass pb-2 text-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neon-500"
       >
-        {/* 整个堆叠区统一倾一个很小的角度，和相邻卡片形成错落 */}
+        {/* 整个堆叠区统一倾一个很小的角度，和相邻卡片形成错落；
+            高度按本组叠放后最高的一层算，随照片比例变化 */}
         <span
-          className="relative block h-[290px] w-full"
-          style={{ transform: `rotate(${tilt}deg) scale(${scale})` }}
+          className="relative block w-full"
+          style={{
+            height: stackHeight,
+            transform: `rotate(${tilt}deg) scale(${scale})`,
+          }}
         >
           {stackPhotos.map((photo, layerIndex) => {
             const layer = preset[layerIndex];
@@ -140,9 +168,10 @@ export function AlbumCard({ album, index, onOpen }: AlbumCardProps) {
             return (
               <span
                 key={photo.id}
-                className="photo-stack-layer absolute left-1/2 top-1/2 block w-[260px] rounded-[4px] bg-white p-1.5 shadow-[0_18px_45px_-18px_rgba(0,0,0,0.9)]"
+                className="photo-stack-layer absolute left-1/2 top-1/2 block rounded-[4px] bg-white p-1.5 shadow-[0_18px_45px_-18px_rgba(0,0,0,0.9)]"
                 style={
                   {
+                    width: COVER_WIDTH,
                     zIndex: layer.z,
                     "--x": `${layer.x}px`,
                     "--y": `${layer.y}px`,
@@ -153,15 +182,17 @@ export function AlbumCard({ album, index, onOpen }: AlbumCardProps) {
                   } as CSSProperties
                 }
               >
-                <span className="relative block aspect-[4/3] overflow-hidden bg-ink-800">
+                {/* 内图按源文件宽高比撑高，白框高度随图变化，竖图更高 */}
+                <span className="relative block overflow-hidden bg-ink-800">
                   {/* 堆叠图只是装饰，集名、简介与张数已构成按钮的可读名称 */}
                   <Image
                     src={photo.src}
                     alt=""
-                    fill
+                    width={photo.width}
+                    height={photo.height}
                     sizes="260px"
                     className={cn(
-                      "object-cover",
+                      "block h-auto w-full",
                       isFront &&
                         "group-hover:scale-110 group-focus-visible:scale-110 transition-transform duration-600",
                     )}
@@ -187,7 +218,7 @@ export function AlbumCard({ album, index, onOpen }: AlbumCardProps) {
 
         <span className="block">
           <span className="flex flex-wrap items-center justify-center gap-2">
-            <span className="font-xiaowei text-[20px] leading-6 text-white/90">
+            <span className="font-xiaowei text-[20px] leading-6 text-white/90 group-hover:text-[#A18CFF] transition-color duration-400">
               {album.title}
             </span>
             <span className="glass-panel inline-flex h-6 items-center rounded-[6px] px-2 text-[10px] leading-none text-white/50 tabular-nums font-yahei">

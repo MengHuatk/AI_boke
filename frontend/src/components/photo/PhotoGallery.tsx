@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AlbumCard } from "@/components/photo/AlbumCard";
 import { AlbumDetail } from "@/components/photo/AlbumDetail";
@@ -33,6 +33,31 @@ export function PhotoGallery({ albums }: PhotoGalleryProps) {
   const [activeAlbum, setActiveAlbum] = useState<PhotoAlbum | null>(null);
   const [hasSwitched, setHasSwitched] = useState(false);
 
+  const isDetail = activeAlbum !== null;
+
+  // 进入照片列表时隐藏整页滚动条。滚动条消失会让内容区变宽、整列右移，
+  // 先把它的宽度补到 body 右内边距，退出详情时再还原（与灯箱锁滚动同一思路）。
+  useEffect(() => {
+    if (!isDetail) return;
+
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+    const previousPaddingRight = document.body.style.paddingRight;
+
+    document.documentElement.classList.add("scrollbar-hidden");
+    if (scrollbarWidth > 0) {
+      const paddingRight = Number.parseFloat(
+        window.getComputedStyle(document.body).paddingRight,
+      );
+      document.body.style.paddingRight = `${paddingRight + scrollbarWidth}px`;
+    }
+
+    return () => {
+      document.documentElement.classList.remove("scrollbar-hidden");
+      document.body.style.paddingRight = previousPaddingRight;
+    };
+  }, [isDetail]);
+
   const keyword = query.trim().toLowerCase();
   const visibleAlbums = keyword
     ? albums.filter(
@@ -63,10 +88,10 @@ export function PhotoGallery({ albums }: PhotoGalleryProps) {
       {!activeAlbum && (
         <header className="flex min-h-20 flex-col justify-center gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
           <div>
-            <h1 className="font-xiaowei text-[30px] leading-tight text-white/90 sm:text-[34px]">
+            <h1 className="font-xiaowei text-[50px] leading-tight text-white/90 sm:text-[64px]">
               光影画廊
             </h1>
-            <p className="mt-1 text-[13px] text-white/45 sm:text-sm">
+            <p className="mt-1 text-[13px] text-white/45 sm:text-sm font-xiaowei">
               定格时间，封存虚拟与现实的每一次心跳
             </p>
           </div>
