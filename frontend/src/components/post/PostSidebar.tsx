@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { PostNowPlaying } from "@/components/post/PostNowPlaying";
 import { PostToc } from "@/components/post/PostToc";
 import { Icon } from "@/components/ui/Icon";
 import { SmartLink } from "@/components/ui/SmartLink";
@@ -14,7 +15,7 @@ interface PostSidebarProps {
 }
 
 /**
- * 右轨四盒，自上而下：自我介绍 320×228.5 → 正在播放 320×210（占位）→
+ * 右轨四盒，自上而下：自我介绍 320×228.5 → 正在播放 320×210（PostNowPlaying）→
  * 其他文档 320×235 → 目录 320×238。
  *
  * 目录盒是唯一的例外件：外面套一层 sticky 轨道——前三盒随列滚动，
@@ -59,20 +60,8 @@ export function PostSidebar({ profile, socials, related, headings }: PostSidebar
         </div>
       </div>
 
-      {/* 2 · 正在播放：占位盒，播放器接入后填充 */}
-      <div className="glass-panel-thick flex h-[210px] w-full shrink-0 flex-col gap-3 rounded-glass px-6 py-5">
-        <span className="font-xiaowei text-[13px] text-white/60">正在播放</span>
-        <div aria-hidden className="flex flex-1 items-center justify-center gap-1.5">
-          {[18, 30, 24, 36, 18, 30, 24, 32, 20].map((bar, i) => (
-            <span
-              key={i}
-              className="w-1 rounded-full bg-neon-500/35"
-              style={{ height: bar }}
-            />
-          ))}
-        </div>
-        <span className="text-center text-[11px] text-white/30">播放器接入后填充</span>
-      </div>
+      {/* 2 · 正在播放：与全站音乐状态同源，标题/唱片/歌词都在组件内 */}
+      <PostNowPlaying />
 
       {/* 3 · 其他文档：三篇标题一行、时间一行 */}
       <div className="glass-panel-thick flex h-[235px] w-full shrink-0 flex-col rounded-glass px-6 py-5">

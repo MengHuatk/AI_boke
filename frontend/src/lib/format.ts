@@ -4,6 +4,7 @@
  */
 
 import { uiConfig } from "@/lib/config";
+import type { MomentLocation } from "@/lib/types";
 
 const dateFormatter = new Intl.DateTimeFormat(uiConfig.locale, {
   year: "numeric",
@@ -32,4 +33,9 @@ export function isExternalHref(href: string): boolean {
 /** 把类名数组拼成字符串，过滤掉 falsy 项 */
 export function cn(...classes: Array<string | false | null | undefined>): string {
   return classes.filter(Boolean).join(" ");
+}
+
+/** 说说位置：省 · 市 · 区，卡片展示与搜索过滤共用同一份拼法 */
+export function formatMomentLocation(location: MomentLocation): string {
+  return `${location.province} · ${location.city} · ${location.district}`;
 }

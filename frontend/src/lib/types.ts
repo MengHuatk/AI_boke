@@ -108,6 +108,43 @@ export interface PhotoAlbum {
   photos: PhotoItem[];
 }
 
+/**
+ * 说说（生活动态）。
+ *
+ * 当前数据来自 lib/moments-fixtures 的本地 fixture；后端接口接入后
+ * 字段与后端保持一致，组件与布局骨架不动。
+ */
+export interface MomentLocation {
+  province: string;
+  city: string;
+  district: string;
+}
+
+/** 说说配图：卡片里裁成 100px 方块，灯箱按原始比例显示 */
+export interface MomentImage {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+}
+
+/** 一条生活动态 */
+export interface Moment {
+  id: string;
+  /** 正文，保留换行 */
+  content: string;
+  images: MomentImage[];
+  location: MomentLocation;
+  /** ISO 日期时间字符串，如 "2026-11-02T09:15:00" */
+  published_at: string;
+}
+
+/** 说说作者：头像 + 名字 */
+export interface MomentAuthor {
+  name: string;
+  avatar: string;
+}
+
 /** 数据来源标记：来自后端接口，还是本地兜底数据 */
 export type DataSource = "api" | "fallback";
 
