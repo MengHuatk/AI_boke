@@ -145,6 +145,30 @@ export interface MomentAuthor {
   avatar: string;
 }
 
+/**
+ * 一篇杂谈。
+ *
+ * 当前数据来自 lib/talks-fixtures 的本地 fixture；后端接口接入后
+ * 字段与后端保持一致，卡片与瀑布流骨架不动。
+ */
+export interface Talk {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  cover: string | null;
+  tags: string[];
+  /** 发布时的心情，如 "✨平静"、"✨emo" */
+  mood: string;
+  /** ISO 日期时间字符串，如 "2026-10-30T21:10:00" */
+  published_at: string;
+}
+
+/** 杂谈详情：在卡片摘要之外补上 Markdown 正文 */
+export interface TalkDetail extends Talk {
+  body: string;
+}
+
 /** 数据来源标记：来自后端接口，还是本地兜底数据 */
 export type DataSource = "api" | "fallback";
 

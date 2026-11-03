@@ -1,24 +1,10 @@
 import Image from "next/image";
-import { isValidElement, type ReactNode } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 import { GiscusComments } from "@/components/post/GiscusComments";
 import { Icon } from "@/components/ui/Icon";
+import { MarkdownBody } from "@/components/ui/MarkdownBody";
 import { SmartLink } from "@/components/ui/SmartLink";
-import { headingId } from "@/lib/markdown";
 import type { PostDetail } from "@/lib/types";
-
-/** 把 ReactNode 压平为纯文本：正文标题要么是白文、最多带粗体装饰，压平后即可算锚点 */
-function flatText(node: ReactNode): string {
-  if (typeof node === "string") return node;
-  if (typeof node === "number") return String(node);
-  if (Array.isArray(node)) return node.map(flatText).join("");
-  if (isValidElement(node)) {
-    return flatText((node.props as { children?: ReactNode }).children);
-  }
-  return "";
-}
 
 /**
  * 左主件 798 宽：厚玻璃（glass-panel-thick）长文容器，自上而下——
@@ -28,9 +14,9 @@ function flatText(node: ReactNode): string {
  * 标题盒里时间芯片打头（淡蓝紫 #9aa5ff，与目录滚动条同族），
  * 其后标签一律粉红。盒高 228 是规格的固定值，内容垂直居中。
  *
- * 正文只被 react-markdown 解析一次：段落 / h2 / h3 各渲染成一只
- * glass-panel-subtle 弱玻璃小盒（规格的「段落盒子 + 小标题盒子」），
- * 标题锚点 id 与目录提取同源，配方见 lib/markdown.ts。
+ * 正文交给共享的 MarkdownBody：段落、标题、列表、代码块与引用都在
+ * 那一处维护，杂谈详情页复用同一套映射；标题锚点 id 与目录提取
+ * 同源，配方见 lib/markdown.ts。
  */
 export function PostArticle({ post }: { post: PostDetail }) {
   return (
@@ -87,73 +73,8 @@ export function PostArticle({ post }: { post: PostDetail }) {
           </ul>
         </header>
 
-        {/* 正文盒 */}
-        <div className="flex flex-col gap-3">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              p: ({ children }) => (
-                <p className="rounded-lg px-5 py-3.5 text-[15px] leading-7 text-white/75">
-                  {children}
-                </p>
-              ),
-              h2: ({ children }) => (
-                <h2
-                  id={headingId(flatText(children))}
-                  className=" scroll-mt-[110px] rounded-lg px-5 py-3 font-xiaowei text-[22px] leading-8 text-white/90"
-                >
-                  {children}
-                </h2>
-              ),
-              h3: ({ children }) => (
-                <h3
-                  id={headingId(flatText(children))}
-                  className="scroll-mt-[110px] rounded-lg px-5 py-2.5 font-xiaowei text-[18px] leading-7 text-white/85"
-                >
-                  {children}
-                </h3>
-              ),
-              ul: ({ children }) => (
-                <ul className="list-disc rounded-lg px-5 py-3.5 pl-9 text-[15px] leading-7 text-white/75 marker:text-white/40">
-                  {children}
-                </ul>
-              ),
-              ol: ({ children }) => (
-                <ol className="glass-panel-subtle list-decimal rounded-lg px-5 py-3.5 pl-9 text-[15px] leading-7 text-white/75 marker:text-white/40">
-                  {children}
-                </ol>
-              ),
-              pre: ({ children }) => (
-                <pre className="overflow-x-auto rounded-lg bg-black/45 px-5 py-4 font-mono text-[13px] leading-6 text-white/85">
-                  {children}
-                </pre>
-              ),
-              code: ({ className, children }) =>
-                className ? (
-                  <code className={className}>{children}</code>
-                ) : (
-                  <code className="rounded bg-white/10 px-1.5 py-0.5 text-[13px] text-[#9aa5ff]">
-                    {children}
-                  </code>
-                ),
-              a: ({ children, href }) => (
-                <a
-                  href={href}
-                  className="text-[#9aa5ff] underline decoration-white/25 underline-offset-2 hover:text-white"
-                >
-                  {children}
-                </a>
-              ),
-              blockquote: ({ children }) => (
-                <blockquote className="rounded-lg border-l-2 border-neon-500/60 bg-white/5 px-5 py-3 text-[15px] leading-7 text-white/60">
-                  {children}
-                </blockquote>
-              ),
-            }}
-          >
-            {post.body}
-          </ReactMarkdown>
-        </div>
+        {/* 正文盒：与杂谈详情共用同一套 Markdown 渲染 */}
+        <MarkdownBody body={post.body} />
 
         {/* 评论区：GitHub 登录后才可发表，实现为 giscus 嵌入 */}
         <section aria-label="评论" className="flex flex-col gap-4 pt-2">
