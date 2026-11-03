@@ -1,0 +1,74 @@
+import type { FriendLink } from "@/lib/types";
+
+/**
+ * 友链页测试数据。后端接口接入后整文件替换为真实 FriendLink[]，
+ * 卡片与网格骨架不动。
+ *
+ * 简介故意覆盖一两行到超过三行的长度，用来验证 line-clamp-3。
+ * 头像暂时复用站内的小尺寸封面图，接入真实数据后换成友人头像。
+ */
+export const FRIEND_LINKS: FriendLink[] = [
+  {
+    id: "friend-001",
+    name: "XingHuiSamaの宝藏之地",
+    avatar: "https://bu.dusays.com/2026/03/24/69c1e38ac1846.jpg",
+    bio: "今天我也要学习吗",
+    href: "https://www.xinghuisama.top",
+  },
+  {
+    id: "friend-002",
+    name: "十四行夜航",
+    avatar: "/images/music-cover/壱雫空.jpg",
+    bio: "一个把日常写成小行星带的人，更新频率和月相有关。",
+    href: "https://example.com",
+  },
+  {
+    id: "friend-003",
+    name: "半糖雾岛",
+    avatar: "/images/music-cover/天球(そら)のMúsica.jpg",
+    bio: "代码、咖啡与猫。这里没有宏大叙事，只有被反复保存的草稿。",
+    href: "https://example.com",
+  },
+  {
+    id: "friend-004",
+    name: "星屑回收站",
+    avatar: "/images/music-cover/影色舞.jpg",
+    bio: "收集别人不要的旧灵感，拆开、洗干净，再拼成新的小玩意。前端、视觉与一点点硬件都碰。",
+    href: "https://example.com",
+  },
+  {
+    id: "friend-005",
+    name: "零点回声",
+    avatar: "/images/music-cover/碧天伴走.jpg",
+    bio: "凌晨两点的电台，播放一些没人点播的歌。",
+    href: "https://example.com",
+  },
+  {
+    id: "friend-006",
+    name: "青柠信号塔",
+    avatar: "/images/music-cover/輪符雨.jpg",
+    bio: "给互联网发射微弱的信号，偶尔收到回音就很开心。",
+    href: "https://example.com",
+  },
+  {
+    id: "friend-007",
+    name: "纸上宇宙",
+    avatar: "/images/music-cover/迷星叫%20.webp",
+    bio: "把阅读、旅行和胡思乱想折成纸船，放进这个小小的站点里。如果刚好漂到你面前，欢迎靠岸。",
+    href: "https://example.com",
+  },
+  {
+    id: "friend-008",
+    name: "慢速光年",
+    avatar: "/avatar.jpg",
+    bio: "走得慢一点也没关系，光年本来就是个很大的单位。",
+    href: "https://example.com",
+  },
+  {
+    id: "friend-009",
+    name: "月背信箱",
+    avatar: "/avatar.svg",
+    bio: "写信、拍照、修修补补。月背没有信号，但信箱一直开着。",
+    href: "https://example.com",
+  },
+];

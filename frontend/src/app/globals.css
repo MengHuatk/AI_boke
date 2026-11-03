@@ -86,6 +86,8 @@
   --animate-drift: drift 24s ease-in-out infinite;
   --animate-drift-slow: drift 36s ease-in-out infinite reverse;
   --animate-fade-up: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* 友链卡片的在线呼吸点（消费方 FriendCard.tsx） */
+  --animate-online-breathe: online-breathe 2.6s ease-in-out infinite;
 
   /* 背景轮播的交叉淡化时长。每一张的停留间隔在 .env 里调，这里只管「淡多久」 */
   --duration-bg-fade: 1.5s;
@@ -112,6 +114,37 @@
   from {
     opacity: 0;
     transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 友链卡片的在线圆点：亮度、尺寸与光晕同相位起落，模拟呼吸灯。
+   三个属性都收在可见范围内，减少动态效果下即使只播一帧也仍是实心点。 */
+@keyframes online-breathe {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(0.85);
+    box-shadow: 0 0 0 0 rgb(169 164 255 / 0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 7px 2px rgb(169 164 255 / 0.5);
+  }
+}
+
+/* 友链卡片入场：自下方 14px 升起渐显。单卡 520ms、相邻 70ms。
+   起点延迟 700ms 与路由过渡同长——View Transitions 在动画第 0 帧拍
+   新页快照，带透明度初态的卡片会被拍成透明；整串动画等快照结束再
+   开始，才只播一次。消费方 FriendCard.tsx */
+@keyframes friend-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
   }
   to {
     opacity: 1;
@@ -471,6 +504,15 @@
   animation-delay: calc(var(--i, 0) * 70ms);
 }
 
+/* 友链卡片入场配方：--i 由 FriendCard 按 DOM 序注入。
+   700ms 基础延迟对齐路由过渡，之后每张间隔 70ms。
+   刻意用 backwards 而不是 both：动画结束后不能继续占住 transform，
+   否则 hover 抬升（glass-interactive）会被最终帧的 transform: none 压死。 */
+.friend-rise {
+  animation: friend-rise 0.52s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(700ms + var(--i, 0) * 70ms);
+}
+
 /* ==========================================================================
    照片墙：拍立得照片堆
    每一层白框照片的位置由 AlbumCard 逐层注入：--x / --y / --rot 是静止
@@ -622,6 +664,7 @@
      只压时长的话卡片会先静默一秒多、再逐一瞬间闪现，反而更晃眼 */
   .view-fade,
   .view-rise,
+  .friend-rise,
   .route-enter-initial,
   .photo-swap {
     animation: none;
@@ -629,6 +672,11 @@
 
   /* 光标停闪但保持常亮，免得整个歌词区失去落点 */
   .caret-blink {
+    animation: none;
+  }
+
+  /* 呼吸点直接停在常亮态 */
+  .animate-online-breathe {
     animation: none;
   }
 

@@ -38,6 +38,20 @@ export interface Profile {
   skills: string[];
 }
 
+/**
+ * 友链。
+ *
+ * 当前数据来自 lib/links-fixtures 的本地 fixture；后端接口接入后
+ * 字段与后端保持一致，卡片与网格骨架不动。
+ */
+export interface FriendLink {
+  id: string;
+  name: string;
+  avatar: string;
+  bio: string;
+  href: string;
+}
+
 /** 文章摘要，用于列表与卡片 */
 export interface PostSummary {
   id: string;
