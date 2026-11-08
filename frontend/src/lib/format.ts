@@ -18,6 +18,17 @@ export function formatDate(iso: string): string {
   return Number.isNaN(date.getTime()) ? iso : dateFormatter.format(date);
 }
 
+/** 时间轴用：2026-10-30T21:10:00 → "2026-10-30 21:10" */
+export function formatTimelineTime(iso: string): string {
+  const date = new Date(iso);
+  const pad = (value: number) => String(value).padStart(2, "0");
+
+  return (
+    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ` +
+    `${pad(date.getHours())}:${pad(date.getMinutes())}`
+  );
+}
+
 /** 大数字缩写：1200 → "1.2k"，18000 → "1.8w"（中文习惯用「万」） */
 export function formatCompactNumber(value: number): string {
   if (value < 1000) return String(value);

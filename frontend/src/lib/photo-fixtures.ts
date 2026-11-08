@@ -128,3 +128,16 @@ export const PHOTO_ALBUMS: PhotoAlbum[] = [
     photos: [PHOTO_LIBRARY.p6, PHOTO_LIBRARY.p7, PHOTO_LIBRARY.p8, PHOTO_LIBRARY.p4],
   },
 ];
+
+/**
+ * 从所有相册里随机挑一张照片，供首页相册精选使用。
+ *
+ * 只在服务端组件里调用：每次渲染换一张，页面受 60s 缓存影响。
+ * 放在数据层而不是组件渲染里，避免 React 的 purity 规则把
+ * 组件内的 Math.random 当成重渲染时的不可预测状态。
+ */
+export function pickRandomSpotlight() {
+  const album = PHOTO_ALBUMS[Math.floor(Math.random() * PHOTO_ALBUMS.length)];
+  const photo = album.photos[Math.floor(Math.random() * album.photos.length)];
+  return { album, photo };
+}

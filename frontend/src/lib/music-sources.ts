@@ -19,4 +19,6 @@ export const MUSIC_AUDIO_SOURCES: Partial<Record<string, string>> = {
   "rinpuu": "/audio/輪符雨.mp3",
   // 文件名带尾随空格，URL 里用 %20
   "meisei-kyou": "/audio/迷星叫%20.mp3",
+  "kodoku-kanja": "/audio/孤独患者填词.mp3",
+  "wo-hai-nian-qing": "/audio/我还年轻填词.mp3",
 };

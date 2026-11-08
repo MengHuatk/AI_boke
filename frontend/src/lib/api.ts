@@ -129,3 +129,12 @@ export async function getSite(): Promise<DataResult<SiteConfig>> {
 export async function getPost(slug: string): Promise<DataResult<PostDetail>> {
   return withFallback(() => fetchPost(slug), fallbackPostDetail, "文章详情");
 }
+
+/** 关于页时间轴用的最近文章。后端不可用时退回示例文章列表。 */
+export async function getRecentPosts(limit = 20): Promise<DataResult<PostSummary[]>> {
+  return withFallback(
+    () => fetchPosts({ limit }),
+    fallbackHome.featured_posts,
+    "文章列表",
+  );
+}

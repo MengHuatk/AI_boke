@@ -90,7 +90,7 @@ export function Navbar({ site }: NavbarProps) {
           scrolledPast && "-translate-y-full"
         )}
       >
-        <nav className="glass-panel-nav flex h-18 items-center">
+        <nav className="glass-panel-nav flex h-18 items-center font-xiaowei">
           <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
             {/* 站名 */}
             <SmartLink

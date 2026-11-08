@@ -198,7 +198,7 @@ export function MusicRightPanel({
               const active = index === activeLine;
               const step = getLyricStep(Math.abs(index - activeLine));
               return (
-                <li key={line.time}>
+                <li key={`${line.time}-${index}`}>
                   <button
                     type="button"
                     ref={active ? activeLineRef : undefined}

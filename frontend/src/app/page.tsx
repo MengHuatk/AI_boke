@@ -1,27 +1,37 @@
-import { FeaturedPosts } from "@/components/home/FeaturedPosts";
-import { HeroSection } from "@/components/home/HeroSection";
-import { StatsCard } from "@/components/home/StatsCard";
-import { TagCloud } from "@/components/home/TagCloud";
+import { HomeLyricsBar } from "@/components/home/HomeLyricsBar";
+import { HomeMusicCard } from "@/components/home/HomeMusicCard";
+import { HomeProfileCard } from "@/components/home/HomeProfileCard";
+import { HomeSearch } from "@/components/home/HomeSearch";
+import { HomeShowcase } from "@/components/home/HomeShowcase";
 import { DevNotice } from "@/components/ui/DevNotice";
-import { getHomeData } from "@/lib/api";
+import { getHomeData, getRecentPosts } from "@/lib/api";
+import { PHOTO_ALBUMS, pickRandomSpotlight } from "@/lib/photo-fixtures";
+import { TALKS } from "@/lib/talks-fixtures";
+
+/** 精选区每条轮播展示的条数 */
+const SHOWCASE_LIMIT = 6;
 
 /**
  * 首页。
  *
- * 页面只做两件事：取数据、把区块拼起来。
- * 每个区块是一个独立组件，想调整顺序或增删区块，改下面的 JSX 结构即可。
- *
- * 新增一个区块的做法：
- *   1. 在 components/home/ 下新建组件，用 GlassCard 作容器；
- *   2. 需要新数据就在 lib/api.ts 加一个 fetch 函数，并在 lib/types.ts 补类型；
- *   3. 在这里 import 并插到合适的位置。
- *
- * 目前是一个两栏布局：左栏放主内容，右栏放辅助信息。
- * 屏幕较窄时自动堆叠成单栏。
+ * 自上而下：居中搜索框 → 自我简介卡 + 迷你音乐卡 → 大字歌词盒 →
+ * 归档 / 相册 / 杂谈精选区。搜索覆盖归档文章与杂谈的标题 / 简介 / 标签；
+ * 文章与杂谈数据在服务端取好一次性下发给客户端搜索组件。
+ * 相册精选每次服务端渲染随机挑一张照片，随 props 下发，避免水合不一致。
  */
 export default async function HomePage() {
-  const { data, source } = await getHomeData();
-  const { profile, featured_posts, tags, stats } = data;
+  const [{ data, source }, { data: posts }] = await Promise.all([
+    getHomeData(),
+    getRecentPosts(100),
+  ]);
+  const { profile, stats } = data;
+  const photoCount = PHOTO_ALBUMS.reduce(
+    (total, album) => total + album.photos.length,
+    0,
+  );
+
+  // 每次服务端渲染随机一张相片；页面受 60s 缓存影响，刷新间隔足够时才会换
+  const { album, photo } = pickRandomSpotlight();
 
   return (
     <>
@@ -29,18 +39,32 @@ export default async function HomePage() {
         <DevNotice message="后端未连接，当前展示的是本地示例数据。启动 backend 后刷新即可看到真实内容。" />
       )}
 
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-        {/* 左栏：自我介绍 + 精选文章 */}
-        <div className="flex flex-col gap-5">
-          <HeroSection profile={profile} stats={stats} />
-          <FeaturedPosts posts={featured_posts} />
+      <div className="flex flex-col items-center gap-6 pt-2 sm:pt-6">
+        <HomeSearch posts={posts} talks={TALKS} />
+
+        <div className="flex w-full flex-col justify-center gap-5 xl:max-w-[1068px] xl:flex-row">
+          <HomeProfileCard
+            profile={profile}
+            articleCount={stats.posts}
+            talkCount={TALKS.length}
+            photoCount={photoCount}
+          />
+          <HomeMusicCard />
         </div>
 
-        {/* 右栏：辅助信息 */}
-        <div className="flex flex-col gap-5">
-          <StatsCard stats={stats} />
-          <TagCloud tags={tags} />
-        </div>
+        <HomeLyricsBar />
+
+        <HomeShowcase
+          posts={posts.slice(0, SHOWCASE_LIMIT)}
+          talks={TALKS.slice(0, SHOWCASE_LIMIT)}
+          spotlight={{
+            albumTitle: album.title,
+            albumDescription: album.description,
+            photoSrc: photo.src,
+            photoAlt: photo.alt,
+            photoCount: album.photos.length,
+          }}
+        />
       </div>
     </>
   );

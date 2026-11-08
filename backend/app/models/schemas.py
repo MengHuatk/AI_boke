@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 
@@ -60,7 +60,7 @@ class PostSummary(BaseModel):
     excerpt: str
     cover: str | None = None
     tags: list[str] = Field(default_factory=list)
-    published_at: date
+    published_at: datetime
     reading_minutes: int = 5
     featured: bool = False
 

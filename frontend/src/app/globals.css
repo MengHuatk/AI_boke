@@ -514,6 +514,109 @@
 }
 
 /* ==========================================================================
+   关于页：横幅待机漂移、头像柔光、标签内容错峰
+   —— 横幅与 hover 放大拆成两层：外层 .about-drift 持续做极缓慢的
+   Ken Burns，内层图片负责 hover 的 1.15 倍放大，避免两个 transform
+   互相覆盖。标签切换的 .about-line 只在用户点击后由 AboutCard 挂上，
+   首访不播透明度动画，交给路由过渡。
+   ========================================================================== */
+
+@keyframes about-drift {
+  0%,
+  100% {
+    transform: scale(1.03) translate3d(-1%, 1%, 0);
+  }
+  50% {
+    transform: scale(1.07) translate3d(1%, -1%, 0);
+  }
+}
+
+.about-drift {
+  animation: about-drift 26s ease-in-out infinite;
+}
+
+/* 头像背后的一圈紫蓝光，只在明暗和尺寸上轻微起落 */
+@keyframes avatar-halo {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+.avatar-halo {
+  opacity: 0.5;
+  animation: avatar-halo 6.5s ease-in-out infinite;
+}
+
+/* 关于页标签内容的错峰入场：单行 450ms，相邻 60ms */
+@keyframes about-line-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.about-line {
+  animation: about-line-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* 思绪动态：最新节点的呼吸、NEW 徽标的微光、轮询新增条目的滑入 */
+@keyframes activity-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.25);
+  }
+}
+
+.activity-pulse {
+  animation: activity-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes activity-new {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(255 255 255 / 0);
+  }
+  50% {
+    box-shadow: 0 0 12px 1px rgb(255 255 255 / 0.16);
+  }
+}
+
+.activity-new {
+  animation: activity-new 3.2s ease-in-out infinite;
+}
+
+@keyframes activity-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.activity-enter {
+  animation: activity-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ==========================================================================
    照片墙：拍立得照片堆
    每一层白框照片的位置由 AlbumCard 逐层注入：--x / --y / --rot 是静止
    位置，--hover-* 是鼠标移入后微微散开的位置。外层 .group 由卡片按钮
@@ -624,6 +727,178 @@
 }
 
 /* ==========================================================================
+   首页音乐卡：切句时歌词背后横向扫过一次辉光
+   由歌词文本作为 key 重新挂载触发；只做装饰，不参与布局
+   ========================================================================== */
+
+@keyframes home-lyric-sweep {
+  from {
+    opacity: 0;
+    transform: translateX(-60%);
+  }
+  35% {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(160%);
+  }
+}
+
+.home-lyric-sweep {
+  animation: home-lyric-sweep 900ms ease-out both;
+}
+
+/* ==========================================================================
+   首页大字歌词盒：播放时的边缘呼吸光
+   暂停由行内 animation-play-state 冻住；减少动态效果由全局规则压掉
+   ========================================================================== */
+
+@keyframes home-lyrics-breathe {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.home-lyrics-glow {
+  animation: home-lyrics-breathe 4.5s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   首页大字歌词盒：切歌时的封面交叉、缓慢漂移与底部横光
+   底层铺上一张封面，顶层从模糊中淡入当前封面；横光只在切歌后挂载一次
+   ========================================================================== */
+
+/* 顶层封面从 0 淡入到 1（整层的底色与模糊由外层容器统一给），
+   同时从更糊的状态收紧，切换时能明显看到「化开」的过渡 */
+@keyframes home-cover-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* 低模糊封面缓慢漂移：路点刻意不等距，40 秒一轮；1.14 倍放大量
+   连同悬停视差的几像素一起盖住，平移时不会把盒子底边露出来。
+   播放/暂停由组件控制 play-state */
+@keyframes home-cover-drift {
+  0% {
+    transform: translate3d(-2.4%, -1.6%, 0) scale(1.14);
+  }
+  11% {
+    transform: translate3d(1.2%, -2.8%, 0) scale(1.16);
+  }
+  23% {
+    transform: translate3d(2.8%, -0.4%, 0) scale(1.14);
+  }
+  36% {
+    transform: translate3d(1.2%, 2.6%, 0) scale(1.16);
+  }
+  48% {
+    transform: translate3d(-1.4%, 2.2%, 0) scale(1.15);
+  }
+  61% {
+    transform: translate3d(-2.8%, 0.2%, 0) scale(1.14);
+  }
+  73% {
+    transform: translate3d(-1.2%, -2.4%, 0) scale(1.16);
+  }
+  86% {
+    transform: translate3d(1.8%, -1.2%, 0) scale(1.14);
+  }
+  100% {
+    transform: translate3d(-2.4%, -1.6%, 0) scale(1.14);
+  }
+}
+
+.home-cover-drift {
+  animation: home-cover-drift 40s ease-in-out infinite;
+}
+
+/* 首页大字歌词的同色微光：模糊降低后仍能在游动封面上保持可读 */
+.home-lyric-glow {
+  text-shadow: 0 0 18px rgb(144 110 255 / 0.55);
+}
+
+@keyframes home-cover-sweep {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  20% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(200%);
+  }
+}
+
+.home-cover-sweep {
+  animation: home-cover-sweep 800ms ease-out 100ms both;
+}
+
+/* ==========================================================================
+   首页精选区：轮播切换与主题占位的昼夜球
+   换页仿歌词盒背景：底层保留上一张封面，新封面从模糊、轻微放大与偏暗
+   中显影；标题与简介延后 140ms 再模糊淡入。圆点宽度由组件控制
+   ========================================================================== */
+
+@keyframes showcase-cover-in {
+  from {
+    opacity: 0;
+    filter: blur(10px) brightness(0.9);
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px) brightness(1);
+    transform: scale(1);
+  }
+}
+
+.showcase-cover {
+  animation: showcase-cover-in 900ms ease-in-out backwards;
+}
+
+@keyframes showcase-text-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+.showcase-text {
+  animation: showcase-text-in 560ms ease-out 140ms backwards;
+}
+
+/* 主题占位卡的昼夜球：在暗/亮两半之间缓慢往返，纯装饰 */
+@keyframes theme-orb-drift {
+  from {
+    transform: translate(-50%, -50%) translateX(-42px);
+  }
+  to {
+    transform: translate(-50%, -50%) translateX(42px);
+  }
+}
+
+.theme-orb {
+  animation: theme-orb-drift 16s ease-in-out infinite alternate;
+}
+
+/* ==========================================================================
    文章页音乐区：打字机光标
    硬开硬关的方块光标（不淡入淡出），减少动态效果时在下方整条停住
    ========================================================================== */
@@ -666,7 +941,15 @@
   .view-rise,
   .friend-rise,
   .route-enter-initial,
-  .photo-swap {
+  .photo-swap,
+  .about-drift,
+  .avatar-halo,
+  .about-line,
+  .activity-pulse,
+  .activity-new,
+  .activity-enter,
+  .showcase-cover,
+  .showcase-text {
     animation: none;
   }
 
