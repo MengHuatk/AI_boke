@@ -27,6 +27,8 @@
 
 import { useSyncExternalStore, type CSSProperties } from "react";
 
+import { useTheme } from "@/components/layout/useTheme";
+
 interface Firefly {
   /** 水平位置，视口百分比 */
   x: number;
@@ -124,8 +126,10 @@ function getServerSnapshot(): Firefly[] | null {
 
 export function FireflyShadow() {
   const flies = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
+  const theme = useTheme();
 
-  if (flies === null) return null;
+  // 日间模式停止萤火虫：直接不渲染，省掉整层动画
+  if (theme === "day" || flies === null) return null;
 
   return (
     <div

@@ -213,7 +213,7 @@ export function CircleNav({ site, pathname }: CircleNavProps) {
           {/* 圆盘本体：入场 缩小+正转180° → 复原；出场 复原 → 缩小+反转180°+淡出 */}
           <div
             className={cn(
-              "relative transition-[transform,opacity] duration-300 ease-out",
+              "keep-light relative transition-[transform,opacity] duration-300 ease-out",
               exiting ? "opacity-0" : "opacity-100"
             )}
             style={{

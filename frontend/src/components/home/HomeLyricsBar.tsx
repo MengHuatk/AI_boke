@@ -72,7 +72,7 @@ export function HomeLyricsBar() {
       <div
         role="group"
         aria-label="当前歌词"
-        className="relative flex h-20 w-full overflow-hidden rounded-glass border border-white/8 bg-[#0a1424]/95"
+        className="home-lyrics-bar relative flex h-20 w-full overflow-hidden rounded-glass border border-white/8 bg-[#0a1424]/95"
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
       >

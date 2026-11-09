@@ -22,13 +22,12 @@ export function PhotoSpotlight({
   albumDescription,
   photoSrc,
   photoAlt,
-  photoCount,
 }: PhotoSpotlightData) {
   return (
     <div
       role="group"
       aria-label="相册精选"
-      className="group relative isolate h-[218px] w-full overflow-hidden rounded-glass bg-[#0a0f1d] shadow-[0_22px_60px_-24px_rgba(0,0,0,0.95)] transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_28px_70px_-26px_rgba(0,0,0,1),0_0_44px_-12px_rgba(144,110,255,0.45)]"
+      className="group media-text relative isolate h-[218px] w-full overflow-hidden rounded-glass bg-[#0a0f1d] shadow-[0_22px_60px_-24px_rgba(0,0,0,0.95)] transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_28px_70px_-26px_rgba(0,0,0,1),0_0_44px_-12px_rgba(144,110,255,0.45)]"
     >
       <Image
         src={photoSrc}
@@ -57,9 +56,7 @@ export function PhotoSpotlight({
         className="pointer-events-none absolute inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
       />
 
-      <span className="pointer-events-none absolute top-5 right-5 z-20 rounded-full glass-panel px-3 py-1 font-yahei text-[11px] leading-none text-white/70">
-        {photoCount} 张
-      </span>
+
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col gap-2 p-7">
         <div className="w-fit rounded-[14px] px-4 py-2.5">

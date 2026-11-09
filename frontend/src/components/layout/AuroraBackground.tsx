@@ -74,7 +74,7 @@ export function AuroraBackground() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-ink-950"
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[var(--page-bg)]"
     >
       {/* 1. 背景图轮播。容器本身是 fixed，所以图片天然不随页面滚动 */}
       <BackgroundCarousel />
@@ -83,7 +83,10 @@ export function AuroraBackground() {
              刻意放在轮播层外面而不是跟着图一起淡化 —— 否则每次切图，
              整页明暗都会跟着闪一下 */}
       {images.length > 0 && imageDim > 0 && (
-        <div className="absolute inset-0 bg-ink-950" style={{ opacity: imageDim }} />
+        <div
+          className="absolute inset-0 bg-[var(--page-bg)]"
+          style={{ opacity: imageDim }}
+        />
       )}
 
       {/* 3. 极光光斑 */}
@@ -106,12 +109,12 @@ export function AuroraBackground() {
 
       {/* 4. 噪点 */}
       <div
-        className="absolute inset-0 opacity-[0.035] mix-blend-overlay"
+        className="aurora-noise absolute inset-0 opacity-[0.035] mix-blend-overlay"
         style={{ backgroundImage: NOISE_URL }}
       />
 
       {/* 5. 底部压暗，保证页脚区域的文字对比度 */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-950/80" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--page-bg)]" />
     </div>
   );
 }

@@ -57,7 +57,7 @@ export function TalkShowcase({ talks }: { talks: Talk[] }) {
       role="group"
       aria-roledescription="轮播"
       aria-label="杂谈精选"
-      className="group relative h-[218px] w-full overflow-hidden rounded-glass bg-[#0a0f1d] shadow-[0_22px_60px_-24px_rgba(0,0,0,0.95)] transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_28px_70px_-26px_rgba(0,0,0,1),0_0_44px_-12px_rgba(144,110,255,0.45)] sm:flex-1 xl:w-[461px] xl:flex-none"
+      className="group media-text relative h-[218px] w-full overflow-hidden rounded-glass bg-[#0a0f1d] shadow-[0_22px_60px_-24px_rgba(0,0,0,0.95)] transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_28px_70px_-26px_rgba(0,0,0,1),0_0_44px_-12px_rgba(144,110,255,0.45)] sm:flex-1 xl:w-[461px] xl:flex-none"
       onPointerEnter={() => setPaused(true)}
       onPointerLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}

@@ -80,7 +80,7 @@ export function AlbumDetail({ album, onBack }: AlbumDetailProps) {
 
             {/* 下框渐变遮罩：固定覆盖图片下半 50%，hover 时整体淡入；
                 照片名从最终位置下方 10px 处淡入并上移 */}
-            <span className="absolute inset-x-0 bottom-0 flex h-1/2 items-end bg-gradient-to-t from-black/70 via-black/30 to-transparent px-4 pb-4 text-left opacity-0 transition-opacity duration-[880ms] ease-out group-hover:opacity-100 group-focus-visible:opacity-100">
+            <span className="media-text absolute inset-x-0 bottom-0 flex h-1/2 items-end bg-gradient-to-t from-black/70 via-black/30 to-transparent px-4 pb-4 text-left opacity-0 transition-opacity duration-[880ms] ease-out group-hover:opacity-100 group-focus-visible:opacity-100">
               <span className="block translate-y-2.5 font-xiaowei text-[15px] leading-5 tracking-wide text-white/90 opacity-0 transition-all duration-[1000ms] ease-out group-hover:translate-y-0 group-hover:opacity-100 group-hover:delay-[90ms] group-focus-visible:translate-y-0 group-focus-visible:opacity-100 group-focus-visible:delay-[90ms]">
                 {photo.title}
               </span>

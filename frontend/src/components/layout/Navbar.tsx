@@ -97,7 +97,7 @@ export function Navbar({ site }: NavbarProps) {
               href="/"
               className="flex shrink-0 items-center gap-2.5 transition-opacity hover:opacity-85"
             >
-              <span className="grid size-7 place-items-center rounded-full bg-gradient-to-br from-brand-300 to-brand-600 text-[13px] font-bold text-white shadow-[0_4px_14px_-4px_var(--color-brand-500)]">
+              <span className="keep-light grid size-7 place-items-center rounded-full bg-gradient-to-br from-brand-300 to-brand-600 text-[13px] font-bold text-white shadow-[0_4px_14px_-4px_var(--color-brand-500)]">
                 {site.name.slice(0, 1)}
               </span>
               <span className="text-sm font-semibold tracking-tight text-white/90">

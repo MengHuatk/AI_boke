@@ -146,7 +146,7 @@ export function MiniMusicPlayer() {
       role="group"
       aria-label="迷你音乐播放器"
       className={cn(
-        "fixed z-[55] flex h-[58px] w-[274px] cursor-grab touch-none items-center gap-2 rounded-full border border-white/10 bg-[#0a1424] pr-2 pl-2 shadow-[0_16px_40px_-18px_rgb(0_0_0/0.95)] transition-[opacity,filter,transform] ease-out select-none active:cursor-grabbing",
+        "mini-player-shell fixed z-[55] flex h-[58px] w-[274px] cursor-grab touch-none items-center gap-2 rounded-full border border-white/10 bg-[#0a1424] pr-2 pl-2 shadow-[0_16px_40px_-18px_rgb(0_0_0/0.95)] transition-[opacity,filter,transform] ease-out select-none active:cursor-grabbing",
         // 进入首页：600ms 模糊溶解；离开首页：350ms 淡入
         inactive
           ? "pointer-events-none scale-[0.96] opacity-0 blur-[6px] duration-[600ms]"
@@ -186,7 +186,7 @@ export function MiniMusicPlayer() {
           onClick={togglePlay}
           aria-label={playing ? "暂停" : "播放"}
           title={playing ? "暂停" : "播放"}
-          className="grid size-8 shrink-0 cursor-pointer place-items-center rounded-full bg-[#5D00FF] text-white transition-colors duration-200 hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
+          className="keep-light grid size-8 shrink-0 cursor-pointer place-items-center rounded-full bg-[#5D00FF] text-white transition-colors duration-200 hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
         >
           <Icon name={playing ? "pause" : "play"} size={14} />
         </button>

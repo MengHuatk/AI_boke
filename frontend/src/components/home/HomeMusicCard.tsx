@@ -160,7 +160,7 @@ export function HomeMusicCard() {
           onClick={togglePlay}
           aria-label={playing ? "暂停" : "播放"}
           title={playing ? "暂停" : "播放"}
-          className="grid size-11 place-items-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-[inset_0_1px_0_0_rgb(255_255_255/0.3),0_10px_28px_-12px_var(--color-brand-600)] transition-transform duration-200 hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
+          className="keep-light grid size-11 place-items-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-[inset_0_1px_0_0_rgb(255_255_255/0.3),0_10px_28px_-12px_var(--color-brand-600)] transition-transform duration-200 hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
         >
           <Icon name={playing ? "pause" : "play"} size={30} />
         </button>

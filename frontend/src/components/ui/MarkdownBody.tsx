@@ -24,7 +24,7 @@ function flatText(node: ReactNode): string {
  */
 export function MarkdownBody({ body }: { body: string }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="markdown-body flex flex-col gap-3">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{

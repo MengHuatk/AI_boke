@@ -49,7 +49,7 @@ export function TalkCard({ talk }: TalkCardProps) {
           )}
 
           {/* 心情盒：图片右上角，30px 高半透明白底 */}
-          <span className="absolute top-2 right-2 inline-flex h-[30px] items-center rounded-md border border-white/20 bg-white/15 px-2.5 text-[13px] leading-none whitespace-nowrap text-white/85 backdrop-blur-md">
+          <span className="media-text absolute top-2 right-2 inline-flex h-[30px] items-center rounded-md border border-white/20 bg-white/15 px-2.5 text-[13px] leading-none whitespace-nowrap text-white/85 backdrop-blur-md">
             {talk.mood}
           </span>
         </div>

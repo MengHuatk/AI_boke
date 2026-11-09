@@ -2,13 +2,52 @@
 
 import { useEffect, useRef } from "react";
 
+import type { Theme } from "@/components/layout/useTheme";
+import { WIND_SLOPE, getWind } from "@/components/music/wind";
+
 interface RainCanvasProps {
-  playing: boolean;
-  /** 0.15–1：由播放进度换算出的目标雨势 */
+  /** 雨幕是否开启；关闭后继续绘制 fadeOutMs 再停掉循环 */
+  active: boolean;
+  /** 0.15–1：当前目标雨势（播放进度或暂停时的固定雨量） */
   level: number;
-  /** 暂停后继续绘制多久再停掉 requestAnimationFrame */
-  pauseFadeMs: number;
+  /** 0–1：雨量密度系数；通过抬高出现门槛缩放可见雨滴数量 */
+  density: number;
+  /** 是否生成底部水花 */
+  splashEnabled: boolean;
+  /** 低画质：DPR 上限降到 1.5 */
+  lowQuality: boolean;
+  /** 关闭后继续绘制多久再停掉 requestAnimationFrame */
+  fadeOutMs: number;
+  /** 夜间白色雨、日间淡蓝色雨 */
+  theme: Theme;
 }
+
+/** 一套雨滴配色：精灵内部两层 + 亮头 + 水花 + 画布合成方式 */
+interface RainPalette {
+  glow: string;
+  core: string;
+  head: string;
+  splash: string;
+  composite: GlobalCompositeOperation;
+}
+
+const RAIN_PALETTES: Record<Theme, RainPalette> = {
+  night: {
+    glow: "rgba(236, 242, 255, 0.126)",
+    core: "rgba(236, 242, 255, 0.6375)",
+    head: "rgba(242, 247, 255, 0.4)",
+    splash: "rgba(236, 242, 255, 0.8)",
+    composite: "lighter",
+  },
+  day: {
+    glow: "rgba(96, 165, 250, 0.16)",
+    core: "rgba(96, 201, 250, 0.6)",
+    head: "rgba(59, 187, 246, 0.55)",
+    splash: "rgba(21, 131, 221, 0.8)",
+    // 亮底上用 lighter 会叠成白色，日间改用正常覆盖才看得见淡蓝雨丝
+    composite: "source-over",
+  },
+};
 
 interface RainDrop {
   /** 横向位置，0–1，窗口缩放时自动跟着宽度走 */
@@ -45,9 +84,9 @@ interface RainSplash {
   alpha: number;
 }
 
-/** 按面积决定雨滴数量，小屏不会被几百颗雨滴拖慢 */
+/** 按面积决定雨滴数量；比原先更稀，减少大屏上的绘制压力 */
 function getDropCount(width: number, height: number) {
-  return Math.round(Math.min(240, Math.max(90, (width * height) / 9000)));
+  return Math.round(Math.min(150, Math.max(60, (width * height) / 14000)));
 }
 
 /**
@@ -57,11 +96,8 @@ function getDropCount(width: number, height: number) {
  */
 const RAIN_THIN_PER_SECOND = 0.16;
 
-/** 风的最大斜率：约 12°，雨丝的倾斜和横向位移共用同一个斜率 */
-const WIND_SLOPE = 0.22;
-
 /** 同屏水花上限，暴雨时也不会无限堆积 */
-const MAX_SPLASHES = 48;
+const MAX_SPLASHES = 24;
 
 /**
  * 雨滴精灵的尺寸：柔光与雨丝按 72:20 的宽度比烘焙到一张小图上，
@@ -73,24 +109,13 @@ const SPRITE_HEIGHT = 128;
 const GLOW_SCALE = SPRITE_WIDTH / SPRITE_CORE_WIDTH;
 
 /**
- * 全局风场：一条约 20 秒的大风向 + 一条约 7 秒的阵风叠加。
- * 返回值在 -0.85–0.85 之间，让整片雨慢慢左右摆动。
- */
-function getWind(now: number) {
-  const seconds = now / 1000;
-  return (
-    0.6 * Math.sin(seconds * 0.32) + 0.25 * Math.sin(seconds * 0.9 + 1.7)
-  );
-}
-
-/**
  * 预渲染一颗雨滴的「外层柔光 + 雨丝主体」。
  *
  * 原先每颗雨滴都要画两条不同宽度的描边，改为整帧只需要对每颗雨滴
  * 做一次 drawImage；光晕和本体都从这张固定小图里按实际粗细缩放。
  * 两层在精灵内部同样使用 lighter 叠加，和原来主画布上的效果一致。
  */
-function createRainSprite() {
+function createRainSprite(palette: RainPalette) {
   const sprite = document.createElement("canvas");
   sprite.width = SPRITE_WIDTH;
   sprite.height = SPRITE_HEIGHT;
@@ -104,7 +129,7 @@ function createRainSprite() {
   const center = SPRITE_WIDTH / 2;
 
   // 外层柔光：对应原先「0.45 颜色透明度 × 0.28 全局透明度」
-  spriteCtx.strokeStyle = "rgba(236, 242, 255, 0.126)";
+  spriteCtx.strokeStyle = palette.glow;
   spriteCtx.lineWidth = SPRITE_WIDTH;
   spriteCtx.beginPath();
   spriteCtx.moveTo(center, 0);
@@ -112,7 +137,7 @@ function createRainSprite() {
   spriteCtx.stroke();
 
   // 雨丝主体：对应原先「0.85 × 0.75」
-  spriteCtx.strokeStyle = "rgba(236, 242, 255, 0.6375)";
+  spriteCtx.strokeStyle = palette.core;
   spriteCtx.lineWidth = SPRITE_CORE_WIDTH;
   spriteCtx.beginPath();
   spriteCtx.moveTo(center, 0);
@@ -126,7 +151,8 @@ function createRainSprite() {
  * 生成一整批雨滴。
  *
  * depth 越大，雨滴越粗、越长、越快、越亮，形成近大远小的层次；
- * threshold 分散在 0–0.82，播放进度越高，能越过门槛的雨滴越多。
+ * threshold 分散在 0–1，播放进度越高，能越过门槛的雨滴越多；
+ * 雨量密度会在绘制时再缩放这个门槛。
  * 每颗雨滴的长度、粗细、速度、亮度、附加斜率都单独随机，不会出现一批同模子。
  */
 function seedDrops(drops: RainDrop[], width: number, height: number) {
@@ -146,7 +172,7 @@ function seedDrops(drops: RainDrop[], width: number, height: number) {
       speed: 520 + depth * 820 + Math.random() * 180,
       drift: 0.008 + depth * 0.018 + Math.random() * 0.01,
       alpha: 0.3 + depth * 0.45 + Math.random() * 0.15,
-      threshold: Math.random() * 0.82,
+      threshold: Math.random(),
       splashed: false,
     });
   }
@@ -183,6 +209,7 @@ function drawSplashes(
   ctx: CanvasRenderingContext2D,
   splashes: RainSplash[],
   dt: number,
+  palette: RainPalette,
 ) {
   for (let index = splashes.length - 1; index >= 0; index -= 1) {
     const splash = splashes[index];
@@ -198,7 +225,7 @@ function drawSplashes(
     const fade = 1 - progress;
 
     ctx.globalAlpha = splash.alpha * fade * fade;
-    ctx.strokeStyle = "rgba(236, 242, 255, 0.8)";
+    ctx.strokeStyle = palette.splash;
     ctx.lineWidth = 1.2 * (0.5 + fade * 0.5);
     ctx.beginPath();
     // 只画上半圈：水花从底部向上打开，不把圆环画完整
@@ -231,7 +258,10 @@ function drawFrame(
   height: number,
   dt: number,
   level: number,
+  density: number,
   wind: number,
+  splashEnabled: boolean,
+  palette: RainPalette,
 ) {
   ctx.clearRect(0, 0, width, height);
 
@@ -249,10 +279,11 @@ function drawFrame(
     if (drop.x > 1) drop.x -= 1;
     else if (drop.x < 0) drop.x += 1;
 
-    // 雨势越高，原本被门槛挡住的雨滴逐渐淡入，形成由疏到密
+    // 雨势越高，原本被门槛挡住的雨滴逐渐淡入，形成由疏到密；
+    // 密度系数抬高门槛，让同一雨势下只有一部分雨滴出现
     const reveal = Math.min(
       1,
-      Math.max(0, (level - drop.threshold) / 0.12),
+      Math.max(0, (level - drop.threshold / density) / 0.12),
     );
 
     // 头部触底：较近、较粗且当前可见的雨滴才溅水，
@@ -260,9 +291,10 @@ function drawFrame(
     if (!drop.splashed && drop.y >= height) {
       drop.splashed = true;
       if (
+        splashEnabled &&
         reveal > 0.25 &&
         drop.width > 1.4 &&
-        Math.random() < 0.4
+        Math.random() < 0.25
       ) {
         spawnSplash(splashes, drop, width, height, reveal);
       }
@@ -303,7 +335,7 @@ function drawFrame(
 
     // 亮头：让每颗雨滴有清楚的落点，而不是一根均匀的线
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = "rgba(242, 247, 255, 0.4)";
+    ctx.fillStyle = palette.head;
     ctx.beginPath();
     ctx.arc(
       x - slope * drop.width * 0.4,
@@ -316,7 +348,7 @@ function drawFrame(
   }
 
   // 水花画在雨滴之后，落在视口底部
-  drawSplashes(ctx, splashes, dt);
+  drawSplashes(ctx, splashes, dt, palette);
 
   ctx.globalAlpha = 1;
 }
@@ -333,37 +365,71 @@ function drawFrame(
  * 外层柔光和雨丝主体预渲染成一张精灵，每颗雨滴只做一次 drawImage；
  * 较近的雨滴落到视口底部时会溅起一圈短暂的水花，雨越密水花越多。
  *
- * 暂停时 canvas 继续画满 2.5s，和 MusicRain 的 CSS 淡出同步，
+ * 关闭雨幕后 canvas 继续画满 fadeOutMs，和 MusicRain 的 CSS 淡出同步，
  * 淡出结束后停掉 requestAnimationFrame，不留下空转的动画循环。
+ * 密度系数抬高每颗雨滴的出现门槛，切换雨量时不会重建整批雨滴，也不会闪。
  */
 export function RainCanvas({
-  playing,
+  active,
   level,
-  pauseFadeMs,
+  density,
+  splashEnabled,
+  lowQuality,
+  fadeOutMs,
+  theme,
 }: RainCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const levelRef = useRef(level);
-  const playingRef = useRef(playing);
+  const densityRef = useRef(density);
+  const splashRef = useRef(splashEnabled);
+  const qualityRef = useRef(lowQuality);
+  const activeRef = useRef(active);
+  const themeRef = useRef(theme);
+  const spriteRef = useRef<HTMLCanvasElement | null>(null);
   const stopAtRef = useRef(0);
   const startRef = useRef<() => void>(() => {});
+  const resizeRef = useRef<() => void>(() => {});
 
-  // 最新雨势和播放状态写进 ref，主循环不需要因为 props 变化重建
+  // 换主题只换精灵与合成方式，不重建主循环：雨滴位置、速度都保持不变
+  useEffect(() => {
+    themeRef.current = theme;
+    spriteRef.current = createRainSprite(RAIN_PALETTES[theme]);
+
+    const ctx = canvasRef.current?.getContext("2d");
+    if (ctx) ctx.globalCompositeOperation = RAIN_PALETTES[theme].composite;
+  }, [theme]);
+
+  // 最新雨势、密度、水花和开关状态写进 ref，主循环不需要因为 props 变化重建
   useEffect(() => {
     levelRef.current = level;
   }, [level]);
 
   useEffect(() => {
-    playingRef.current = playing;
+    densityRef.current = density;
+  }, [density]);
 
-    if (playing) {
+  useEffect(() => {
+    splashRef.current = splashEnabled;
+  }, [splashEnabled]);
+
+  // 低画质只改 DPR 上限，让主循环重新设置一次画布尺寸
+  useEffect(() => {
+    qualityRef.current = lowQuality;
+    resizeRef.current();
+  }, [lowQuality]);
+
+  useEffect(() => {
+    activeRef.current = active;
+
+    if (active) {
       stopAtRef.current = 0;
       startRef.current();
       return;
     }
 
-    // 暂停后让画面继续跑完淡出时长，再停掉循环
-    stopAtRef.current = performance.now() + pauseFadeMs;
-  }, [playing, pauseFadeMs]);
+    // 关闭雨幕后让画面继续跑完淡出时长，再停掉循环
+    stopAtRef.current = performance.now() + fadeOutMs;
+  }, [active, fadeOutMs]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -377,9 +443,9 @@ export function RainCanvas({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // 柔光 + 雨丝的预渲染精灵，整层共用一张
-    const rainSprite = createRainSprite();
-    if (!rainSprite) return;
+    // 柔光 + 雨丝的预渲染精灵，整层共用一张；主题变化时由上方 effect 换新
+    spriteRef.current = createRainSprite(RAIN_PALETTES[themeRef.current]);
+    if (!spriteRef.current) return;
 
     let width = 0;
     let height = 0;
@@ -403,8 +469,8 @@ export function RainCanvas({
       const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
       last = now;
 
-      // 暂停淡出结束后收手：画面已经透明，不需要再画
-      if (!playingRef.current && now >= stopAtRef.current) {
+      // 关闭雨幕的淡出结束后收手：画面已经透明，不需要再画
+      if (!activeRef.current && now >= stopAtRef.current) {
         stop();
         return;
       }
@@ -423,16 +489,22 @@ export function RainCanvas({
       }
 
       const wind = getWind(now);
+      const sprite = spriteRef.current;
+      if (!sprite) return;
+
       drawFrame(
         ctx,
         drops,
         splashes,
-        rainSprite,
+        sprite,
         width,
         height,
         dt,
         smoothedLevel,
+        densityRef.current,
         wind,
+        splashRef.current,
+        RAIN_PALETTES[themeRef.current],
       );
       raf = requestAnimationFrame(frame);
     };
@@ -451,7 +523,7 @@ export function RainCanvas({
       // （window.innerWidth 可能把滚动条也算进去）
       const nextWidth = canvas.clientWidth;
       const nextHeight = canvas.clientHeight;
-      const dpr = Math.min(window.devicePixelRatio, 2);
+      const dpr = Math.min(window.devicePixelRatio, qualityRef.current ? 1.5 : 2);
       const widthChanged = nextWidth !== width;
 
       width = nextWidth;
@@ -460,7 +532,7 @@ export function RainCanvas({
       canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.lineCap = "round";
-      ctx.globalCompositeOperation = "lighter";
+      ctx.globalCompositeOperation = RAIN_PALETTES[themeRef.current].composite;
 
       // 地址栏伸缩只会改高度，没必要把整批雨滴重新洗牌；
       // 宽度变化（窗口缩放/横竖屏）才重新铺一次。
@@ -472,10 +544,11 @@ export function RainCanvas({
       last = performance.now();
     };
 
+    resizeRef.current = resize;
     resize();
     window.addEventListener("resize", resize);
 
-    if (playingRef.current) start();
+    if (activeRef.current) start();
 
     return () => {
       window.removeEventListener("resize", resize);
@@ -483,6 +556,7 @@ export function RainCanvas({
       // StrictMode 会先跑一遍 cleanup 再重跑 effect；把启动入口换回空函数，
       // 避免上一轮的 start 被重新调用后多开一条 requestAnimationFrame。
       startRef.current = () => {};
+      resizeRef.current = () => {};
     };
   }, []);
 

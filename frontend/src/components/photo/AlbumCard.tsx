@@ -201,7 +201,7 @@ export function AlbumCard({ album, index, onOpen }: AlbumCardProps) {
                   {/* 只有最上方的主图挂 hover 遮罩：下半 50% 固定渐变，
                       hover 时整体淡入；张数与 CTA 从下方 10px 错峰上浮淡入 */}
                   {isFront && (
-                    <span className="absolute inset-x-0 bottom-0 flex h-1/2 flex-col items-start justify-end gap-0.5 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-2 pb-4 text-left opacity-0 transition-opacity duration-[400ms] ease-out group-hover:opacity-100 group-focus-visible:opacity-100">
+                    <span className="media-text absolute inset-x-0 bottom-0 flex h-1/2 flex-col items-start justify-end gap-0.5 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-2 pb-4 text-left opacity-0 transition-opacity duration-[400ms] ease-out group-hover:opacity-100 group-focus-visible:opacity-100">
                       <span className="block translate-y-2.5 font-xiaowei text-[18px] leading-3 text-white/80 opacity-0 transition-all duration-[200ms] ease-out group-hover:translate-y-0 group-hover:opacity-100 group-hover:delay-[90ms] group-focus-visible:translate-y-0 group-focus-visible:opacity-100 group-focus-visible:delay-[90ms] mb-2">
                         {album.photos.length} 张照片
                       </span>

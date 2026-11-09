@@ -121,7 +121,8 @@ export function GrassField() {
               marginRight: `${blade.gap}px`,
               borderRadius: "999px 999px 0 0",
               transformOrigin: "50% 100%",
-              background: `linear-gradient(to top, rgb(255 255 255 / ${blade.alpha}), rgb(247 247 247 / 0))`,
+              // 颜色由 globals.css 的 --grass-rgb 控制：夜间白色，日间绿色
+              background: `linear-gradient(to top, rgb(var(--grass-rgb) / calc(${blade.alpha} * var(--grass-alpha-scale))), rgb(var(--grass-tail-rgb) / 0))`,
               animation: `grass-sway ${blade.period}s ease-in-out ${blade.delay}s infinite`,
               "--amp": `${blade.amp}deg`,
               "--skew": `${blade.skew}deg`,

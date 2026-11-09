@@ -9,7 +9,7 @@ type ButtonSize = "sm" | "md";
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
   // 主行动点：实心渐变，视觉权重最高，一屏最多出现一个
   primary:
-    "bg-gradient-to-br from-brand-400 to-brand-600 text-white border border-white/20 " +
+    "keep-light bg-gradient-to-br from-brand-400 to-brand-600 text-white border border-white/20 " +
     "shadow-[inset_0_1px_0_0_rgb(255_255_255/0.3),0_10px_28px_-12px_var(--color-brand-600)] " +
     "hover:from-brand-300 hover:to-brand-500",
 

@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 
+import { SakuraPetals } from "@/components/layout/SakuraPetals";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { MiniMusicPlayer } from "@/components/music/MiniMusicPlayer";
 import { MusicProvider } from "@/components/music/MusicProvider";
 import { MusicRain } from "@/components/music/MusicRain";
+import { RainControl } from "@/components/music/RainControl";
+import { RainSettingsProvider } from "@/components/music/RainSettingsProvider";
 import { getSite } from "@/lib/api";
 import { uiConfig } from "@/lib/config";
 
@@ -54,13 +58,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang={uiConfig.locale}
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
+        {/* 首帧前恢复本地主题，避免日间用户先看到一帧夜色 */}
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`if(localStorage.getItem("glass-notes-theme")==="day")document.documentElement.dataset.theme="day";`}
+        </Script>
         <MusicProvider>
-          <SiteShell>{children}</SiteShell>
-          <MusicRain />
-          <MiniMusicPlayer />
+          <RainSettingsProvider>
+            <SiteShell>{children}</SiteShell>
+            <MusicRain />
+            <SakuraPetals />
+            <MiniMusicPlayer />
+            <RainControl />
+          </RainSettingsProvider>
         </MusicProvider>
       </body>
     </html>

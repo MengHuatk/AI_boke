@@ -93,6 +93,15 @@
   --duration-bg-fade: 1.5s;
 }
 
+/* 昼夜主题的公共变量。夜间是站点原有配色，日间在文件末尾统一覆盖 */
+:root {
+  --page-bg: var(--color-ink-950);
+  /* 草叶渐变的两端颜色与透明度倍率，日间改成绿色 */
+  --grass-rgb: 255 255 255;
+  --grass-tail-rgb: 247 247 247;
+  --grass-alpha-scale: 1;
+}
+
 /* ==========================================================================
    关键帧
    ========================================================================== */
@@ -375,7 +384,7 @@
   }
 
   body {
-    background-color: var(--color-ink-950);
+    background-color: var(--page-bg);
     color: rgb(255 255 255 / 0.86);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -884,18 +893,111 @@
   animation: showcase-text-in 560ms ease-out 140ms backwards;
 }
 
-/* 主题占位卡的昼夜球：在暗/亮两半之间缓慢往返，纯装饰 */
-@keyframes theme-orb-drift {
-  from {
-    transform: translate(-50%, -50%) translateX(-42px);
+/* 主题切换按钮里的星星：缓慢呼吸，避免静态图标显得死板。
+   只动缩放与辉光，不动 opacity，否则会盖掉昼夜交叉淡化用的透明度。 */
+@keyframes theme-star-breathe {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 10px rgb(196 181 253 / 0.55));
   }
-  to {
-    transform: translate(-50%, -50%) translateX(42px);
+  50% {
+    transform: scale(1.06) rotate(4deg);
+    filter: drop-shadow(0 0 18px rgb(196 181 253 / 0.9));
   }
 }
 
-.theme-orb {
-  animation: theme-orb-drift 16s ease-in-out infinite alternate;
+.theme-star {
+  animation: theme-star-breathe 5.5s ease-in-out infinite;
+}
+
+/* 主题按钮的视觉状态完全由 <html data-theme> 驱动：
+   服务端统一渲染夜间结构，日间用户的首帧在 CSS 层就已正确 */
+.theme-orb-button {
+  border-color: rgb(255 255 255 / 0.15);
+  box-shadow: 0 0 38px -8px rgb(144 110 255 / 0.75);
+}
+
+/* 两套渐变与两枚图标叠在同一位置，用 opacity 交叉淡化 */
+.theme-orb-bg,
+.theme-orb-icon {
+  position: absolute;
+  transition: opacity 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-orb-bg {
+  inset: 0;
+  border-radius: inherit;
+}
+
+.theme-orb-icon {
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+}
+
+.theme-orb-bg-night {
+  background: radial-gradient(
+    circle at 36% 28%,
+    #4a3f9e,
+    #241a5e 55%,
+    #120c33 100%
+  );
+  opacity: 1;
+}
+
+.theme-orb-bg-day {
+  background: radial-gradient(
+    circle at 36% 28%,
+    #fff6d8,
+    #f6c97a 48%,
+    #e0a04a 100%
+  );
+  opacity: 0;
+}
+
+.theme-orb-icon-night {
+  opacity: 1;
+}
+
+.theme-orb-icon-day {
+  opacity: 0;
+}
+
+.theme-orbit {
+  border-color: rgb(255 255 255 / 0.2);
+}
+
+/* 两套文案同时存在，由主题属性决定显示哪一套 */
+.theme-day-only {
+  display: none;
+}
+
+/* 切换主题时给整页颜色类属性挂上统一过渡。
+   只列颜色相关属性，不把 transform / opacity / filter 拖进动画；
+   临时类由 ThemeModeCard 在 700ms 后摘掉。 */
+.theme-fading,
+.theme-fading *,
+.theme-fading *::before,
+.theme-fading *::after,
+.theme-fading *::placeholder,
+.theme-fading *::marker {
+  transition:
+    color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+    outline-color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+    text-decoration-color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 600ms cubic-bezier(0.4, 0, 0.2, 1),
+    text-shadow 600ms cubic-bezier(0.4, 0, 0.2, 1),
+    fill 600ms cubic-bezier(0.4, 0, 0.2, 1),
+    stroke 600ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* 按钮的两层渐变与图标要的是透明度过渡，单独提权覆盖上面的通用规则 */
+.theme-fading .theme-orb-bg,
+.theme-fading .theme-orb-icon {
+  transition: opacity 600ms cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* ==========================================================================
@@ -935,6 +1037,16 @@
     transition-duration: 0.01ms !important;
   }
 
+  /* 换肤的全局颜色过渡整类摘掉（组件本身也会跳过临时类） */
+  .theme-fading,
+  .theme-fading *,
+  .theme-fading *::before,
+  .theme-fading *::after,
+  .theme-fading .theme-orb-bg,
+  .theme-fading .theme-orb-icon {
+    transition: none !important;
+  }
+
   /* 切换入场要整条显式摘掉：时长护栏管不到 animation-delay，
      只压时长的话卡片会先静默一秒多、再逐一瞬间闪现，反而更晃眼 */
   .view-fade,
@@ -949,7 +1061,8 @@
   .activity-new,
   .activity-enter,
   .showcase-cover,
-  .showcase-text {
+  .showcase-text,
+  .theme-star {
     animation: none;
   }
 
@@ -976,4 +1089,386 @@
   .music-rain {
     display: none;
   }
+
+  /* 樱花花瓣同样是纯装饰，减少动态效果下整层隐藏 */
+  .sakura-petals {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   日间主题
+   —— 由首页主题卡写入 <html data-theme="day"> 后整体生效。
+   夜间保持站点原有配色；日间把页面底色、极光、毛玻璃与正文一起翻白，
+   照片/封面上的文字保持白色（.media-text 子树不参与反色）。
+   ========================================================================== */
+
+[data-theme="day"] {
+  color-scheme: light;
+
+  --page-bg: #f4f1ea;
+
+  /* 草坪：夜间的白色草叶改成绿色，并整体提高一档不透明度 */
+  --grass-rgb: 92 188 112;
+  --grass-tail-rgb: 128 212 146;
+  --grass-alpha-scale: 1.35;
+
+  /* 亮底上提亮文字：品牌紫在日间需要压深才够对比度 */
+  --color-brand-200: oklch(0.52 0.15 275);
+  --color-brand-300: oklch(0.58 0.16 275);
+
+  /* 极光换成低饱和的粉彩色，铺在米白纸上 */
+  --color-aurora-violet: oklch(0.78 0.09 300);
+  --color-aurora-cyan: oklch(0.86 0.06 210);
+  --color-aurora-rose: oklch(0.84 0.08 12);
+  --color-aurora-amber: oklch(0.9 0.07 78);
+}
+
+[data-theme="day"] body {
+  color: rgb(24 31 51 / 0.86);
+}
+
+/* ---------- 滚动条与选区 ---------- */
+
+[data-theme="day"] * {
+  scrollbar-color: rgb(24 32 52 / 0.28) transparent;
+}
+
+[data-theme="day"] *::-webkit-scrollbar-thumb {
+  background-color: rgb(24 32 52 / 0.28);
+}
+
+/* ---------- 首页主题按钮 ---------- */
+
+[data-theme="day"] .theme-orb-button {
+  border-color: rgb(217 163 90 / 0.45);
+  box-shadow: 0 0 38px -8px rgb(246 201 122 / 0.8);
+}
+
+[data-theme="day"] .theme-orb-bg-night,
+[data-theme="day"] .theme-orb-icon-night {
+  opacity: 0;
+}
+
+[data-theme="day"] .theme-orb-bg-day,
+[data-theme="day"] .theme-orb-icon-day {
+  opacity: 1;
+}
+
+[data-theme="day"] .theme-orbit {
+  border-color: rgb(201 143 61 / 0.4);
+}
+
+[data-theme="day"] .theme-day-only {
+  display: inline;
+}
+
+[data-theme="day"] .theme-night-only {
+  display: none;
+}
+
+/* ---------- 背景层 ---------- */
+
+/* 噪点在亮底上会显得脏，压到几乎不可见 */
+[data-theme="day"] .aurora-noise {
+  opacity: 0.02;
+}
+
+/* ---------- 毛玻璃 ---------- */
+
+[data-theme="day"] .glass-panel,
+[data-theme="day"] .glass-panel-thick {
+  background-color: rgb(255 255 255 / 0.62);
+  background-image: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 0.5) 0%,
+    transparent 45%,
+    transparent 100%
+  );
+  border-color: rgb(24 32 52 / 0.08);
+  box-shadow: 0 12px 36px -16px rgb(24 32 52 / 0.18);
+}
+
+[data-theme="day"] .glass-panel-strong {
+  background-color: rgb(255 255 255 / 0.8);
+  background-image: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 0.7) 0%,
+    rgb(255 255 255 / 0.4) 100%
+  );
+  border-color: rgb(24 32 52 / 0.12);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.9),
+    0 16px 44px -18px rgb(24 32 52 / 0.22);
+}
+
+[data-theme="day"] .glass-panel-nav {
+  background-color: rgb(250 248 243 / 0.78);
+  background-image: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 0.55) 0%,
+    rgb(255 255 255 / 0.3) 100%
+  );
+  box-shadow: 0 16px 44px -20px rgb(24 32 52 / 0.2);
+}
+
+[data-theme="day"] .glass-panel-subtle {
+  background-color: rgb(255 255 255 / 0.55);
+  border-color: rgb(24 32 52 / 0.1);
+  box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.9);
+}
+
+[data-theme="day"] .glass-interactive:hover {
+  border-color: rgb(24 32 52 / 0.18);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.9),
+    0 22px 48px -20px rgb(24 32 52 / 0.24);
+}
+
+/* 封面卡上的玻璃件（如相片张数徽标）保持深色，白字才看得见 */
+[data-theme="day"] .media-text .glass-panel,
+[data-theme="day"] .media-text .glass-panel-strong,
+[data-theme="day"] .media-text .glass-panel-subtle {
+  background-color: rgb(10 15 29 / 0.55);
+  border-color: rgb(255 255 255 / 0.14);
+  box-shadow: 0 10px 40px -10px rgb(0 0 0 / 0.5);
+}
+
+/* ---------- 文本反色 ----------
+   .media-text 子树里有文字压在照片上，那里的白字必须保留；
+   其余所有 text-white/* 按亮度分四档换成深色，层级不塌。 */
+
+[data-theme="day"]
+  :where(
+    [class~="text-white"],
+    [class~="text-white/95"],
+    [class~="text-white/90"],
+    [class~="text-white/85"]
+  ):not(.media-text, .media-text *, .keep-light, .keep-light *) {
+  color: rgb(19 25 43 / 0.92);
+}
+
+[data-theme="day"]
+  :where(
+    [class~="text-white/80"],
+    [class~="text-white/75"],
+    [class~="text-white/70"],
+    [class~="text-white/65"]
+  ):not(.media-text, .media-text *, .keep-light, .keep-light *) {
+  color: rgb(24 31 51 / 0.78);
+}
+
+[data-theme="day"]
+  :where(
+    [class~="text-white/60"],
+    [class~="text-white/55"],
+    [class~="text-white/50"],
+    [class~="text-white/45"]
+  ):not(.media-text, .media-text *, .keep-light, .keep-light *) {
+  color: rgb(30 38 60 / 0.62);
+}
+
+[data-theme="day"]
+  :where(
+    [class~="text-white/40"],
+    [class~="text-white/35"],
+    [class~="text-white/30"],
+    [class~="text-white/25"],
+    [class~="text-white/20"],
+    [class~="text-white/15"]
+  ):not(.media-text, .media-text *, .keep-light, .keep-light *) {
+  color: rgb(36 45 70 / 0.42);
+}
+
+/* hover 时转白的文字在日间转为更深的墨色 */
+[data-theme="day"] [class~="hover:text-white"]:hover,
+[data-theme="day"] [class~="hover:text-white/85"]:hover,
+[data-theme="day"] [class~="hover:text-white/80"]:hover {
+  color: rgb(12 18 34 / 0.95);
+}
+
+[data-theme="day"] .group:hover [class~="group-hover:text-white"],
+[data-theme="day"] .group:hover [class~="group-hover:text-white/85"] {
+  color: rgb(12 18 34 / 0.95);
+}
+
+[data-theme="day"] [class~="placeholder:text-white/35"]::placeholder,
+[data-theme="day"] [class~="placeholder:text-white/30"]::placeholder {
+  color: rgb(36 45 70 / 0.42);
+}
+
+[data-theme="day"] [class~="marker:text-white/40"]::marker {
+  color: rgb(36 45 70 / 0.45);
+}
+
+/* ---------- 半透明白底与描边 ----------
+   只翻带透明度的白色；裸 bg-white 是照片白框等刻意保留的白。 */
+
+[data-theme="day"]
+  :where([class~="bg-white/5"], [class~="bg-white/8"]):not(
+    .media-text,
+    .media-text *
+  ) {
+  background-color: rgb(22 30 50 / 0.05);
+}
+
+[data-theme="day"]
+  :where([class~="bg-white/10"], [class~="bg-white/15"]):not(
+    .media-text,
+    .media-text *
+  ) {
+  background-color: rgb(22 30 50 / 0.08);
+}
+
+[data-theme="day"]
+  :where([class~="bg-white/20"], [class~="bg-white/30"]):not(
+    .media-text,
+    .media-text *
+  ) {
+  background-color: rgb(22 30 50 / 0.12);
+}
+
+[data-theme="day"] [class~="hover:bg-white/5"]:not(
+    .media-text,
+    .media-text *,
+    .keep-light,
+    .keep-light *
+  ):hover,
+[data-theme="day"] [class~="hover:bg-white/8"]:not(
+    .media-text,
+    .media-text *,
+    .keep-light,
+    .keep-light *
+  ):hover {
+  background-color: rgb(22 30 50 / 0.06);
+}
+
+[data-theme="day"] [class~="hover:bg-white/10"]:not(
+    .media-text,
+    .media-text *,
+    .keep-light,
+    .keep-light *
+  ):hover,
+[data-theme="day"] [class~="hover:bg-white/20"]:not(
+    .media-text,
+    .media-text *,
+    .keep-light,
+    .keep-light *
+  ):hover {
+  background-color: rgb(22 30 50 / 0.1);
+}
+
+[data-theme="day"]
+  :where(
+    [class~="border-white/8"],
+    [class~="border-white/10"],
+    [class~="border-white/15"]
+  ):not(.media-text, .media-text *, .keep-light, .keep-light *) {
+  border-color: rgb(24 32 52 / 0.1);
+}
+
+[data-theme="day"]
+  :where(
+    [class~="border-white/20"],
+    [class~="border-white/25"]
+  ):not(.media-text, .media-text *, .keep-light, .keep-light *) {
+  border-color: rgb(24 32 52 / 0.16);
+}
+
+[data-theme="day"] [class~="hover:border-white/20"]:not(
+    .media-text,
+    .media-text *,
+    .keep-light,
+    .keep-light *
+  ):hover,
+[data-theme="day"] [class~="hover:border-white/25"]:not(
+    .media-text,
+    .media-text *,
+    .keep-light,
+    .keep-light *
+  ):hover {
+  border-color: rgb(24 32 52 / 0.22);
+}
+
+[data-theme="day"] [class~="ring-white/15"] {
+  --tw-ring-color: rgb(24 32 52 / 0.15);
+}
+
+[data-theme="day"] [class~="ring-white/30"] {
+  --tw-ring-color: rgb(24 32 52 / 0.25);
+}
+
+/* 分隔线里的白色渐变停在亮底上看不见，换成浅墨色；封面卡的高光保持白色 */
+[data-theme="day"]
+  [class~="via-white/10"]:not(
+    .media-text,
+    .media-text *,
+    .keep-light,
+    .keep-light *
+  ) {
+  --tw-gradient-via: rgb(24 32 52 / 0.14);
+}
+
+[data-theme="day"]
+  [class~="via-white/30"]:not(
+    .media-text,
+    .media-text *,
+    .keep-light,
+    .keep-light *
+  ) {
+  --tw-gradient-via: rgb(24 32 52 / 0.22);
+}
+
+/* ---------- 实体深色底（搜索下拉、相册内框等） ---------- */
+
+[data-theme="day"]
+  :where([class~="bg-ink-950/95"], [class~="bg-ink-950/90"]) {
+  background-color: rgb(255 255 255 / 0.94);
+}
+
+[data-theme="day"] [class~="bg-ink-800"] {
+  background-color: rgb(226 229 237);
+}
+
+/* 搜索下拉在亮底上改用更轻的投影 */
+[data-theme="day"] .archive-lookup-scroll {
+  box-shadow: 0 24px 60px -26px rgb(24 32 52 / 0.3);
+}
+
+[data-theme="day"] .home-lyrics-bar {
+  background-color: rgb(255 255 255 / 0.72);
+  border-color: rgb(24 32 52 / 0.1);
+}
+
+[data-theme="day"] .mini-player-shell {
+  background-color: rgb(255 255 255 / 0.82);
+  border-color: rgb(24 32 52 / 0.1);
+  box-shadow: 0 16px 40px -18px rgb(24 32 52 / 0.3);
+}
+
+/* ---------- 正文里的代码块与淡紫强调色 ---------- */
+
+[data-theme="day"] .markdown-body pre {
+  background-color: rgb(22 30 50 / 0.06);
+}
+
+[data-theme="day"] .markdown-body pre code {
+  color: rgb(19 25 43 / 0.9);
+}
+
+[data-theme="day"]
+  :where(
+    [class~="text-neon-500"],
+    [class~="text-neon-600"],
+    [class~="text-[#9aa5ff]"],
+    [class~="text-[#906eff]"],
+    [class~="text-[#A18CFF]"],
+    [class~="text-[#957DFF]"]
+  ):not(.media-text, .media-text *, .keep-light, .keep-light *) {
+  color: #5b45d6;
+}
+
+/* 日间歌词仍保留一点同色微光，但比夜间收敛 */
+[data-theme="day"] .home-lyric-glow {
+  text-shadow: 0 0 12px rgb(120 90 230 / 0.25);
 }

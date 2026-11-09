@@ -98,7 +98,7 @@ export function MomentCard({
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 {showOverflow && (
-                  <span className="absolute inset-0 grid place-items-center bg-black/45 text-[15px] font-medium text-white backdrop-blur-[3px]">
+                  <span className="media-text absolute inset-0 grid place-items-center bg-black/45 text-[15px] font-medium text-white backdrop-blur-[3px]">
                     +{hiddenImageCount}
                   </span>
                 )}

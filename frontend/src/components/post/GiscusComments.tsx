@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+import { useTheme } from "@/components/layout/useTheme";
+
 /** giscus 三件套：仓库开 Discussions 后在 https://giscus.app/ 生成，填进 .env.local */
 const GISCUS = {
   repo: process.env.NEXT_PUBLIC_GISCUS_REPO ?? "",
@@ -45,6 +47,7 @@ export function GiscusComments({
   term,
 }: GiscusCommentsProps) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     const host = hostRef.current;
@@ -64,13 +67,13 @@ export function GiscusComments({
     script.setAttribute("data-mapping", mapping);
     if (term) script.setAttribute("data-term", term);
     script.setAttribute("data-lang", "zh-CN");
-    script.setAttribute("data-theme", "transparent_dark");
+    script.setAttribute("data-theme", theme === "day" ? "light" : "transparent_dark");
     host.appendChild(script);
 
     return () => {
       host.replaceChildren();
     };
-  }, [mapping, term]);
+  }, [mapping, term, theme]);
 
   if (!CONFIGURED) {
     return (

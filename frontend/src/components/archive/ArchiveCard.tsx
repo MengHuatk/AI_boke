@@ -79,7 +79,7 @@ export function ArchiveCard({
           )}
 
           {/* 日期徽章：叠在图片上，left-15px / bottom-10px，黑色半透明底保证压图可读 */}
-          <span className="absolute bottom-[10px] left-[15px] inline-flex items-center gap-1 rounded-md bg-black/50 px-1.5 py-0.5 text-[10px] leading-none text-white/85 tabular-nums">
+          <span className="media-text absolute bottom-[10px] left-[15px] inline-flex items-center gap-1 rounded-md bg-black/50 px-1.5 py-0.5 text-[10px] leading-none text-white/85 tabular-nums">
             <Icon name="calendar" size={10} />
             {post.published_at.slice(2, 10)}
           </span>
