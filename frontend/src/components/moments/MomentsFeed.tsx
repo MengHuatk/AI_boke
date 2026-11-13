@@ -176,7 +176,9 @@ export function MomentsFeed({ moments, author }: MomentsFeedProps) {
         </div>
       ) : (
         <p className="glass-panel-subtle mx-auto mt-10 flex h-40 w-full max-w-[560px] items-center justify-center rounded-glass px-6 text-center text-[14px] text-white/50">
-          没有找到与「{keyword}」匹配的生活动态
+          {keyword
+            ? `没有找到与「${keyword}」匹配的生活动态`
+            : "还没有生活动态。"}
         </p>
       )}
 

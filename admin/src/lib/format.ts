@@ -6,13 +6,14 @@ const publicSiteUrl =
 /**
  * 封面与正文图片的预览地址。
  *
- * 旧内容的封面是公开站静态路径（/images/...），后台跑在另一个端口，
- * 直接引用会 404；这里按公开站地址补全。上传接口返回的是完整 URL，
- * 原样返回。
+ * 上传图片以 /uploads/... 相对路径入库：Vite dev server 与 FastAPI
+ * 都代理/挂载了该路径，原样返回即可。旧内容的封面是公开站静态路径
+ * （/images/...），后台跑在另一个端口，需要按公开站地址补全。
  */
 export function previewAssetUrl(value: string): string {
   if (!value) return "";
   if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith("/uploads/")) return value;
   return `${publicSiteUrl.replace(/\/+$/, "")}${value}`;
 }
 
@@ -22,6 +23,13 @@ export function formatDateTime(value: string | null): string {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+/** 秒 → "m:ss"，与公开站播放器保持一致。 */
+export function formatDuration(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const rest = Math.floor(seconds % 60);
+  return `${minutes}:${rest.toString().padStart(2, "0")}`;
 }
 
 /** 后端是无时区 ISO；直接截字符串，避免 new Date 按 UTC 解释。 */

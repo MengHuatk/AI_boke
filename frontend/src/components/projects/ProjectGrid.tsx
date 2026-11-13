@@ -1,6 +1,6 @@
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import type { ProjectCardPhase } from "@/components/projects/ProjectCard";
-import type { Project } from "@/lib/project-fixtures";
+import type { Project } from "@/lib/types";
 
 export interface ProjectGridItem {
   project: Project;

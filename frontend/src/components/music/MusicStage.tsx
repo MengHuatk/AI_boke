@@ -41,6 +41,32 @@ export function MusicStage() {
     cycleOrder,
   } = useMusic();
 
+  if (!track) {
+    return (
+      <section className="relative left-1/2 flex w-[1200px] max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-col gap-8">
+        <header className="flex flex-col gap-3">
+          <h1 className="text-5xl font-xiaowei tracking-tight text-white sm:text-6xl xl:text-[64px]">
+            云端乐律
+          </h1>
+          <p className="text-sm text-white/45 sm:text-[15px] font-xiaowei">
+            在代码的缝隙中寻找灵魂的共鸣
+          </p>
+        </header>
+
+        <div className="glass-panel grid min-h-[320px] place-items-center rounded-glass px-8 text-center">
+          <div>
+            <p className="font-xiaowei text-lg text-white/70">
+              还没有音乐
+            </p>
+            <p className="mt-2 text-sm text-white/40">
+              去后台添加曲目、封面和歌词后，这里会自动出现播放器。
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative left-1/2 flex w-[1200px] max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-col gap-8">
       {/* 标题区：贴 1200px 面板左侧 */}

@@ -7,7 +7,7 @@ import type { ProjectGridItem } from "@/components/projects/ProjectGrid";
 import { ProjectSearch } from "@/components/projects/ProjectSearch";
 import { Icon } from "@/components/ui/Icon";
 import { SmartLink } from "@/components/ui/SmartLink";
-import type { Project } from "@/lib/project-fixtures";
+import type { Project } from "@/lib/types";
 
 interface ProjectsMatrixProps {
   projects: Project[];

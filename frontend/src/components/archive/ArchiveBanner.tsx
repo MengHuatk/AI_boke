@@ -5,12 +5,13 @@ import { useState } from "react";
 import { ArchiveGrid } from "@/components/archive/ArchiveGrid";
 import { ArchiveSearch } from "@/components/archive/ArchiveSearch";
 import {
+  ALL_TAG,
   ArchiveTagBar,
   type ArchiveViewMode,
 } from "@/components/archive/ArchiveTagBar";
 import { HubTimeline } from "@/components/archive/HubTimeline";
-import { ALL_TAG, ARCHIVE_TAGS, TEST_POSTS } from "@/lib/archive-fixtures";
 import { cn } from "@/lib/format";
+import type { PostSummary } from "@/lib/types";
 
 /**
  * 归档页主体。
@@ -26,6 +27,9 @@ import { cn } from "@/lib/format";
  * ViewTransition，否则新页快照会拍到组件的透明初态。只有用户主动
  * 切换视图时，才把 animateEntrance 打开。
  *
+ * 文章由归档页服务端取好后传入；本组件只负责客户端的标签过滤、
+ * 搜索与视图切换。
+ *
  * 选中态都收在这层：selectedTag 默认「全部档案」，过滤后的文章
  * 是两条视图共同的入参；viewMode 默认中枢链路，决定渲染哪个、
  * 也决定用哪套壳。
@@ -33,7 +37,7 @@ import { cn } from "@/lib/format";
  * 后的帖子池；它的结果盒是 absolute 浮层，打字时盖住下方内容，
  * 不给这层的 in-flow 布局添一丝位移。
  */
-export function ArchiveBanner() {
+export function ArchiveBanner({ posts }: { posts: PostSummary[] }) {
   const [selectedTag, setSelectedTag] = useState<string>(ALL_TAG);
   const [viewMode, setViewMode] = useState<ArchiveViewMode>("hub");
 
@@ -48,16 +52,18 @@ export function ArchiveBanner() {
     setViewMode(next);
   }
 
-  const posts =
+  const tags = [ALL_TAG, ...new Set(posts.flatMap((post) => post.tags))];
+
+  const visiblePosts =
     selectedTag === ALL_TAG
-      ? TEST_POSTS
-      : TEST_POSTS.filter((post) => post.tags.includes(selectedTag));
+      ? posts
+      : posts.filter((post) => post.tags.includes(selectedTag));
 
   const isHub = viewMode === "hub";
 
   return (
     <section
-      aria-label="档案预留区"
+      aria-label="归档内容"
       className={cn(
         "mx-auto flex w-full max-w-[1024px] flex-col items-center gap-10",
         isHub ? "pt-4" : "h-dvh rounded-glass pt-4 pb-10",
@@ -65,10 +71,10 @@ export function ArchiveBanner() {
     >
       <span className="text-[50px]  font-xiaowei">归档与探索</span>
 
-      <ArchiveSearch posts={posts} />
+      <ArchiveSearch posts={visiblePosts} />
 
       <ArchiveTagBar
-        tags={ARCHIVE_TAGS}
+        tags={tags}
         selectedTag={selectedTag}
         onSelectTag={setSelectedTag}
         viewMode={viewMode}
@@ -76,9 +82,9 @@ export function ArchiveBanner() {
       />
 
       {isHub ? (
-        <HubTimeline posts={posts} animateEntrance={animateEntrance} />
+        <HubTimeline posts={visiblePosts} animateEntrance={animateEntrance} />
       ) : (
-        <ArchiveGrid posts={posts} animateEntrance={animateEntrance} />
+        <ArchiveGrid posts={visiblePosts} animateEntrance={animateEntrance} />
       )}
     </section>
   );

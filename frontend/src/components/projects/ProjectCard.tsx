@@ -6,7 +6,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Icon } from "@/components/ui/Icon";
 import { SmartLink } from "@/components/ui/SmartLink";
 import { cn } from "@/lib/format";
-import type { Project } from "@/lib/project-fixtures";
+import type { Project } from "@/lib/types";
 
 /** 卡片阶段：visible 静止；entering 播入场；exiting 播退场，结束后由父层摘除 */
 export type ProjectCardPhase = "visible" | "entering" | "exiting";

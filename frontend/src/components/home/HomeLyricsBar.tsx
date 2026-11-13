@@ -4,6 +4,7 @@ import { useRef, useState, type PointerEvent } from "react";
 
 import { LyricViewport } from "@/components/music/LyricViewport";
 import { useMusic } from "@/components/music/MusicProvider";
+import { coverBackground } from "@/lib/music";
 
 /** 悬停视差的最大位移：横向 ±5px、纵向 ±3px */
 const PARALLAX_X = 10;
@@ -25,19 +26,30 @@ export function HomeLyricsBar() {
 
   // 记下上一张封面：切歌时底层换成上一张，新封面在顶层淡入。
   // 用渲染期派生状态（受 track.id 守卫），避免 effect 里同步 setState。
-  const [cover, setCover] = useState({
-    trackId: track.id,
-    previous: track.cover,
-    current: track.cover,
+  const [cover, setCover] = useState(() => ({
+    trackId: track?.id ?? "",
+    previous: track ? coverBackground(track.cover) : "",
+    current: track ? coverBackground(track.cover) : "",
     version: 0,
-  });
-  if (cover.trackId !== track.id) {
+  }));
+  const trackId = track?.id ?? "";
+  if (track && cover.trackId !== trackId) {
     setCover({
-      trackId: track.id,
+      trackId,
       previous: cover.current,
-      current: track.cover,
+      current: coverBackground(track.cover),
       version: cover.version + 1,
     });
+  }
+
+  if (!track) {
+    return (
+      <div className="relative flex h-20 w-full items-center justify-center rounded-glass border border-white/8 bg-[#0a1424]/95 px-6 text-center xl:max-w-[1068px]">
+        <p className="font-xiaowei text-[15px] text-white/45">
+          还没有音乐，歌词会在这里滚动。
+        </p>
+      </div>
+    );
   }
 
   /** 悬停视差：背景最多朝指针方向偏移 5×3px，离开后缓慢归位 */

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 
 import { SakuraPetals } from "@/components/layout/SakuraPetals";
 import { SiteShell } from "@/components/layout/SiteShell";
@@ -10,7 +9,7 @@ import { MusicProvider } from "@/components/music/MusicProvider";
 import { MusicRain } from "@/components/music/MusicRain";
 import { RainControl } from "@/components/music/RainControl";
 import { RainSettingsProvider } from "@/components/music/RainSettingsProvider";
-import { getSite } from "@/lib/api";
+import { getMusicTracks, getSite } from "@/lib/api";
 import { uiConfig } from "@/lib/config";
 
 import "./globals.css";
@@ -55,19 +54,29 @@ export async function generateMetadata(): Promise<Metadata> {
  * MusicProvider 这一层，站内切页时不会卸载，音乐可以连续播放。
  * 页面本身不关心背景/导航/页脚，新增路由自动继承。
  */
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const { data: tracks } = await getMusicTracks();
+
   return (
     <html
       lang={uiConfig.locale}
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        {/* 首帧前恢复本地主题，避免日间用户先看到一帧夜色。
+            服务端输出 text/javascript 立即执行；客户端 hydration 时渲染为
+            text/plain，避免 React 对组件内 <script> 的告警。 */}
+        <script
+          type={typeof window === "undefined" ? "text/javascript" : "text/plain"}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: `if(localStorage.getItem("glass-notes-theme")==="day")document.documentElement.dataset.theme="day";`,
+          }}
+        />
+      </head>
       <body className="min-h-full">
-        {/* 首帧前恢复本地主题，避免日间用户先看到一帧夜色 */}
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`if(localStorage.getItem("glass-notes-theme")==="day")document.documentElement.dataset.theme="day";`}
-        </Script>
-        <MusicProvider>
+        <MusicProvider tracks={tracks}>
           <RainSettingsProvider>
             <SiteShell>{children}</SiteShell>
             <MusicRain />

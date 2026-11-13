@@ -1,0 +1,245 @@
+[
+  {
+    "id": "album-city-nights",
+    "slug": "city-nights",
+    "title": "城市夜色",
+    "description": "霓虹、车流，和凌晨两点还没关掉的便利店。",
+    "created_at": "2026-03-14",
+    "photos": [
+      {
+        "src": "/images/backgrounds/01.jpg",
+        "alt": "示例照片 01",
+        "title": "城市灯火",
+        "width": 2174,
+        "height": 1295
+      },
+      {
+        "src": "/images/backgrounds/04.jpg",
+        "alt": "示例照片 04",
+        "title": "海面",
+        "width": 3800,
+        "height": 2400
+      },
+      {
+        "src": "/images/backgrounds/08.jpg",
+        "alt": "示例照片 08",
+        "title": "暮色",
+        "width": 1570,
+        "height": 884
+      },
+      {
+        "src": "/images/backgrounds/02.jpg",
+        "alt": "示例照片 02",
+        "title": "街角",
+        "width": 5338,
+        "height": 2861
+      },
+      {
+        "src": "/images/backgrounds/05.jpg",
+        "alt": "示例照片 05",
+        "title": "午后",
+        "width": 2079,
+        "height": 2079
+      }
+    ]
+  },
+  {
+    "id": "album-mountains",
+    "slug": "mountains",
+    "title": "山野四季",
+    "description": "雾从谷底升起来的时候，山才真正醒着。",
+    "created_at": "2026-05-02",
+    "photos": [
+      {
+        "src": "/images/backgrounds/03.jpg",
+        "alt": "示例照片 03",
+        "title": "山雾",
+        "width": 3250,
+        "height": 3575
+      },
+      {
+        "src": "/images/backgrounds/06.jpg",
+        "alt": "示例照片 06",
+        "title": "树影",
+        "width": 1681,
+        "height": 2071
+      },
+      {
+        "src": "/images/backgrounds/05.jpg",
+        "alt": "示例照片 05",
+        "title": "午后",
+        "width": 2079,
+        "height": 2079
+      },
+      {
+        "src": "/images/backgrounds/07.jpg",
+        "alt": "示例照片 07",
+        "title": "波光",
+        "width": 2079,
+        "height": 2079
+      }
+    ]
+  },
+  {
+    "id": "album-everyday",
+    "slug": "everyday",
+    "title": "人间烟火",
+    "description": "菜市场的灯、路边的猫，和生活本来的样子。",
+    "created_at": "2025-12-21",
+    "photos": [
+      {
+        "src": "/images/backgrounds/02.jpg",
+        "alt": "示例照片 02",
+        "title": "街角",
+        "width": 5338,
+        "height": 2861
+      },
+      {
+        "src": "/images/backgrounds/05.jpg",
+        "alt": "示例照片 05",
+        "title": "午后",
+        "width": 2079,
+        "height": 2079
+      },
+      {
+        "src": "/images/backgrounds/01.jpg",
+        "alt": "示例照片 01",
+        "title": "城市灯火",
+        "width": 2174,
+        "height": 1295
+      },
+      {
+        "src": "/images/backgrounds/06.jpg",
+        "alt": "示例照片 06",
+        "title": "树影",
+        "width": 1681,
+        "height": 2071
+      },
+      {
+        "src": "/images/backgrounds/07.jpg",
+        "alt": "示例照片 07",
+        "title": "波光",
+        "width": 2079,
+        "height": 2079
+      }
+    ]
+  },
+  {
+    "id": "album-coastline",
+    "slug": "coastline",
+    "title": "海岸线",
+    "description": "潮水退下去以后，沙滩上留下整片天空的倒影。",
+    "created_at": "2026-07-08",
+    "photos": [
+      {
+        "src": "/images/backgrounds/04.jpg",
+        "alt": "示例照片 04",
+        "title": "海面",
+        "width": 3800,
+        "height": 2400
+      },
+      {
+        "src": "/images/backgrounds/08.jpg",
+        "alt": "示例照片 08",
+        "title": "暮色",
+        "width": 1570,
+        "height": 884
+      },
+      {
+        "src": "/images/backgrounds/07.jpg",
+        "alt": "示例照片 07",
+        "title": "波光",
+        "width": 2079,
+        "height": 2079
+      },
+      {
+        "src": "/images/backgrounds/03.jpg",
+        "alt": "示例照片 03",
+        "title": "山雾",
+        "width": 3250,
+        "height": 3575
+      }
+    ]
+  },
+  {
+    "id": "album-virtual",
+    "slug": "virtual",
+    "title": "虚拟之境",
+    "description": "屏幕里的光也是光，代码里也能长出一片森林。",
+    "created_at": "2026-01-19",
+    "photos": [
+      {
+        "src": "/images/backgrounds/05.jpg",
+        "alt": "示例照片 05",
+        "title": "午后",
+        "width": 2079,
+        "height": 2079
+      },
+      {
+        "src": "/images/backgrounds/01.jpg",
+        "alt": "示例照片 01",
+        "title": "城市灯火",
+        "width": 2174,
+        "height": 1295
+      },
+      {
+        "src": "/images/backgrounds/03.jpg",
+        "alt": "示例照片 03",
+        "title": "山雾",
+        "width": 3250,
+        "height": 3575
+      },
+      {
+        "src": "/images/backgrounds/02.jpg",
+        "alt": "示例照片 02",
+        "title": "街角",
+        "width": 5338,
+        "height": 2861
+      },
+      {
+        "src": "/images/backgrounds/06.jpg",
+        "alt": "示例照片 06",
+        "title": "树影",
+        "width": 1681,
+        "height": 2071
+      }
+    ]
+  },
+  {
+    "id": "album-film",
+    "slug": "film",
+    "title": "旧日胶片",
+    "description": "那些拍糊了也舍不得删的瞬间。",
+    "created_at": "2024-11-30",
+    "photos": [
+      {
+        "src": "/images/backgrounds/06.jpg",
+        "alt": "示例照片 06",
+        "title": "树影",
+        "width": 1681,
+        "height": 2071
+      },
+      {
+        "src": "/images/backgrounds/07.jpg",
+        "alt": "示例照片 07",
+        "title": "波光",
+        "width": 2079,
+        "height": 2079
+      },
+      {
+        "src": "/images/backgrounds/08.jpg",
+        "alt": "示例照片 08",
+        "title": "暮色",
+        "width": 1570,
+        "height": 884
+      },
+      {
+        "src": "/images/backgrounds/04.jpg",
+        "alt": "示例照片 04",
+        "title": "海面",
+        "width": 3800,
+        "height": 2400
+      }
+    ]
+  }
+]

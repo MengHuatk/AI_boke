@@ -6,10 +6,11 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/format";
 import {
+  coverBackground,
   findActiveLine,
   formatDuration,
   type MusicTrack,
-} from "@/lib/music-fixtures";
+} from "@/lib/music";
 
 type RightView = "lyrics" | "playlist";
 
@@ -244,7 +245,7 @@ export function MusicRightPanel({
                         "size-10 shrink-0 rounded-lg border shadow-[inset_0_1px_0_0_rgb(255_255_255/0.2)]",
                         active ? "border-neon-500/50" : "border-white/10",
                       )}
-                      style={{ background: item.cover }}
+                      style={{ background: coverBackground(item.cover) }}
                     />
 
                     <span className="flex min-w-0 flex-1 flex-col">

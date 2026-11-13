@@ -120,7 +120,11 @@ export function PhotoGallery({ albums }: PhotoGalleryProps) {
           <AlbumDetail album={activeAlbum} onBack={backToGallery} />
         ) : (
           <section aria-label="照片集">
-            {visibleAlbums.length > 0 ? (
+            {albums.length === 0 ? (
+              <p className="glass-panel-subtle flex h-40 items-center justify-center rounded-glass text-sm text-white/50">
+                还没有照片集，去后台添加一组吧
+              </p>
+            ) : visibleAlbums.length > 0 ? (
               <ul className="grid grid-cols-1 items-start gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
                 {visibleAlbums.map((album, index) => (
                   <AlbumCard

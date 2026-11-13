@@ -16,8 +16,8 @@ interface ArchiveGridProps {
  * 在本容器内纵向滚动。滚动条由 globals.css 的 .archive-scroll
  * 染色：深紫圆条，hover / 拖动变浅紫。
  *
- * 数据由外层传入并按选中标签过滤；测试数据在 lib/archive-fixtures，
- * 真实档案接入后换掉来源即可，布局骨架不动。
+ * 数据由归档页服务端取好后经 ArchiveBanner 传入，并按选中标签过滤；
+ * 本组件只负责布局与入场动画。
  *
  * 视图切换挂载时整块缓慢淡入（view-fade），卡片再按 DOM 序
  * （从左到右、从上到下）逐张错峰升起（view-rise，见 globals.css）。

@@ -6,7 +6,7 @@ import { useMusic } from "@/components/music/MusicProvider";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Icon } from "@/components/ui/Icon";
 import { SmartLink } from "@/components/ui/SmartLink";
-import { findActiveLine, formatDuration } from "@/lib/music-fixtures";
+import { coverBackground, findActiveLine, formatDuration } from "@/lib/music";
 
 /** 打字机速度：每字 40ms */
 const TYPE_SPEED_MS = 40;
@@ -37,6 +37,26 @@ export function HomeMusicCard() {
   const { track, playing, elapsed, duration, togglePlay, goPrev, goNext, seek } =
     useMusic();
 
+  if (!track) {
+    return (
+      <GlassCard
+        padding="none"
+        className="flex w-full flex-col items-center justify-center gap-2 p-6 text-center xl:h-[280px] xl:w-[433px] xl:shrink-0"
+      >
+        <p className="font-xiaowei text-[20px] text-white/75">还没有音乐</p>
+        <p className="text-sm text-white/40">
+          去后台添加曲目后，这里会出现正在播放的唱片。
+        </p>
+        <SmartLink
+          href="/music"
+          className="mt-2 text-sm text-brand-300 transition-colors hover:text-white"
+        >
+          打开音乐页 ↗
+        </SmartLink>
+      </GlassCard>
+    );
+  }
+
   const active = findActiveLine(track.lyrics, elapsed);
   // 前奏时把第一句作为预告；没有歌词时才退回歌手名
   const lyric =
@@ -63,7 +83,7 @@ export function HomeMusicCard() {
         <div className="relative size-[76px] shrink-0">
           <div
             className="absolute -inset-1 rounded-full opacity-40 blur-lg"
-            style={{ background: track.cover }}
+            style={{ background: coverBackground(track.cover) }}
           />
 
           <div
@@ -73,7 +93,7 @@ export function HomeMusicCard() {
             <div
               className="absolute inset-0 rounded-full"
               style={{
-                background: track.cover,
+                background: coverBackground(track.cover),
                 maskImage: HOLE_MASK,
                 WebkitMaskImage: HOLE_MASK,
               }}

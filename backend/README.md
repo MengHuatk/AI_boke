@@ -16,7 +16,10 @@ FastAPI + SQLite。公开接口只读，管理接口需要登录。
 # 3. 导入旧 JSON 内容（可重复执行，已存在的 slug 会跳过）
 .venv/Scripts/python.exe scripts/import_json.py
 
-# 4. 生成管理员密码哈希与会话密钥，把输出写进 backend/.env
+# 4. 导入照片集、项目、友链、音乐与生活动态示例（可重复执行，已存在的记录会跳过）
+.venv/Scripts/python.exe scripts/import_frontend_content.py
+
+# 5. 生成管理员密码哈希与会话密钥，把输出写进 backend/.env
 .venv/Scripts/python.exe scripts/hash_password.py
 ```
 
@@ -64,11 +67,20 @@ npm run build
 ## 数据与备份
 
 - 文章与杂谈：`app/blog.db`（SQLite，WAL 模式）。
-- 上传图片：`uploads/`。
+- 照片集、照片、项目、友链、音乐曲目与生活动态：同样存 `app/blog.db`。
+  音乐歌词存在 `music_tracks.lyrics`，生活动态的配图与位置存在
+  `moments.images`、`moments.location`，都是 JSON 整段保存。
+- 上传图片：`uploads/images/`；上传音频：`uploads/audio/`。
 - 站点配置与个人资料：仍为 `app/data/site.json`、`app/data/profile.json`，
-  后台暂不编辑，直接改文件即可。
+  后台暂不编辑，直接改文件即可。说说卡片的作者姓名与头像来自个人资料。
 - 原始文章与杂谈种子：`app/data/posts.json`、`app/data/talks.json`，
   导入脚本只读不写。
+- 照片集、项目、友链、音乐与生活动态种子：`app/data/photo_albums.json`、
+  `app/data/projects.json`、`app/data/friend_links.json`、
+  `app/data/music_tracks.json`、`app/data/moments.json`，导入脚本只读不写。
+  音乐种子中的音频与封面路径仍指向前端 `frontend/public` 下的既有文件，
+  生活动态配图同样引用 `/images/backgrounds/*`；后台新上传的素材保存到
+  `backend/uploads/`。
 
 备份数据库（建议先停掉后端）：
 
@@ -78,14 +90,19 @@ npm run build
 
 ## 接口边界
 
-- 公开只读：`/api/v1/posts`、`/api/v1/talks`、`/api/v1/site`、
-  `/api/v1/profile`、`/api/v1/home`、`/api/v1/tags`、`/api/v1/stats`。
-  只返回已发布内容。
+- 公开只读：`/api/v1/posts`、`/api/v1/talks`、`/api/v1/albums`、
+  `/api/v1/projects`、`/api/v1/links`、`/api/v1/music`、`/api/v1/moments`、
+  `/api/v1/site`、`/api/v1/profile`、`/api/v1/home`、`/api/v1/tags`、
+  `/api/v1/stats`。只返回已发布内容。
 - 管理接口：`/api/v1/admin/*`。仅在 `BLOG_ADMIN_ENABLED=true` 时注册，
-  除登录外都要求会话。
+  除登录外都要求会话。文章、杂谈、照片集、项目、友链、音乐、生活动态
+  都支持列表、详情、新建、更新与删除。
 - 上传：`POST /api/v1/admin/uploads`，仅接受 JPEG / PNG / WebP / GIF，
-  默认上限 5 MB。返回的 URL 以前端可访问的后端地址为前缀，由
-  `BLOG_PUBLIC_BASE_URL` 控制；本地默认 `http://127.0.0.1:8000`。
+  默认上限 5 MB。`POST /api/v1/admin/uploads/audio` 接受 MP3 / M4A / WAV /
+  OGG / FLAC / AAC，默认上限 30 MB，可用 `BLOG_AUDIO_UPLOAD_MAX_BYTES`
+  调整。两者都返回 `/uploads/...` 相对路径；公开站通过 Next 的
+  `/uploads/:path*` rewrite 代理到 FastAPI，管理端的 Vite dev server
+  也代理同一路径。
 
 ## 部署提醒
 

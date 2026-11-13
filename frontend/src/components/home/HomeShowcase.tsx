@@ -7,7 +7,8 @@ import { ThemeModeCard } from "./ThemeModeCard";
 interface HomeShowcaseProps {
   posts: PostSummary[];
   talks: Talk[];
-  spotlight: PhotoSpotlightData;
+  /** 后端还没有照片集时为 null，用同尺寸占位卡保持右列高度。 */
+  spotlight: PhotoSpotlightData | null;
 }
 
 /**
@@ -27,7 +28,13 @@ export function HomeShowcase({ posts, talks, spotlight }: HomeShowcaseProps) {
       <ArchiveShowcase posts={posts} />
 
       <div className="flex w-full flex-col gap-6 xl:w-[705px] xl:gap-[26px]">
-        <PhotoSpotlight {...spotlight} />
+        {spotlight ? (
+          <PhotoSpotlight {...spotlight} />
+        ) : (
+          <div className="glass-panel grid h-[218px] w-full place-items-center rounded-glass text-sm text-white/40">
+            还没有照片集，去后台添加一组吧
+          </div>
+        )}
 
         <div className="flex flex-col gap-6 sm:flex-row xl:h-[218px] xl:gap-6">
           <TalkShowcase talks={talks} />

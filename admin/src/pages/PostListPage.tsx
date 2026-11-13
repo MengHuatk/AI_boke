@@ -4,9 +4,8 @@ import { Link } from "react-router-dom";
 
 import { deletePost, listPosts } from "../api/client";
 import type { AdminPostSummary, PostStatus } from "../api/types";
+import { PostAdminCard } from "../components/ContentCards";
 import { ConfirmDialog } from "../components/ConfirmDialog";
-import { StatusBadge } from "../components/StatusBadge";
-import { formatDateTime } from "../lib/format";
 
 type Filter = "all" | PostStatus;
 
@@ -120,48 +119,13 @@ export function PostListPage() {
         )}
 
         {posts.length > 0 && (
-          <ul className="mt-3 flex flex-col">
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {posts.map((post) => (
-              <li
+              <PostAdminCard
                 key={post.id}
-                className="flex flex-col gap-3 border-t border-white/10 py-4 first:border-t-0 first:pt-2 sm:flex-row sm:items-center"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Link
-                      to={`/posts/${post.id}`}
-                      className="truncate text-sm font-medium text-white/85 transition hover:text-white"
-                    >
-                      {post.title}
-                    </Link>
-                    <StatusBadge status={post.status} />
-                    {post.featured && (
-                      <span className="rounded-full bg-brand-500/15 px-2 py-0.5 text-xs text-brand-200">
-                        精选
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1 truncate text-xs text-white/35">
-                    /posts/{post.slug} · {formatDateTime(post.updated_at)} 更新
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Link
-                    to={`/posts/${post.id}`}
-                    className="btn btn-ghost px-3 py-1.5 text-xs"
-                  >
-                    编辑
-                  </Link>
-                  <button
-                    type="button"
-                    className="btn btn-danger px-3 py-1.5 text-xs"
-                    onClick={() => setPendingDelete(post)}
-                  >
-                    删除
-                  </button>
-                </div>
-              </li>
+                post={post}
+                onDelete={() => setPendingDelete(post)}
+              />
             ))}
           </ul>
         )}

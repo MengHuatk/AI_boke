@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/format";
-import { ALL_TALK_TAG } from "@/lib/talks-fixtures";
+import { ALL_TALK_TAG } from "@/lib/talks";
 
 /** 选中态：淡紫蓝底 + 亮紫文字 + 外发光，与归档标签栏同一套语言 */
 const SELECTED_CLASS =

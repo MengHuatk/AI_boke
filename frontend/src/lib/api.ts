@@ -5,20 +5,25 @@
  * - 所有对后端的调用都必须经过这里，组件里不出现裸 fetch；
  * - 每个读取函数都返回 DataResult<T>，附带 source 标记，
  *   调用方可以据此提示「当前展示的是示例数据」；
- * - 后端不可用时降级到 fallback.ts，而不是抛错导致整页崩溃；
+ * - 后端不可用时降级到 fallback.ts 或空列表，而不是抛错导致整页崩溃；
  * - 新增接口时照着 fetchHome / getHomeData 的模式加一对函数即可。
  */
 
 import { apiConfig, uiConfig } from "@/lib/config";
 import { fallbackHome, fallbackPostDetail } from "@/lib/fallback";
-import { TALKS } from "@/lib/talks-fixtures";
+import type { MusicTrack } from "@/lib/music";
 import type {
   AnonChatReply,
   AnonChatTurn,
   DataResult,
+  FriendLink,
   HomePayload,
+  Moment,
+  PhotoAlbum,
   PostDetail,
   PostSummary,
+  Profile,
+  Project,
   SiteConfig,
   SiteStats,
   TagStat,
@@ -88,6 +93,10 @@ export function fetchSite(): Promise<SiteConfig> {
   return request<SiteConfig>("/site");
 }
 
+export function fetchProfile(): Promise<Profile> {
+  return request<Profile>("/profile");
+}
+
 export function fetchPosts(params: {
   tag?: string;
   featured?: boolean;
@@ -134,6 +143,26 @@ export function fetchStats(): Promise<SiteStats> {
   return request<SiteStats>("/stats");
 }
 
+export function fetchAlbums(): Promise<PhotoAlbum[]> {
+  return request<PhotoAlbum[]>("/albums");
+}
+
+export function fetchProjects(): Promise<Project[]> {
+  return request<Project[]>("/projects");
+}
+
+export function fetchFriendLinks(): Promise<FriendLink[]> {
+  return request<FriendLink[]>("/links");
+}
+
+export function fetchMusicTracks(): Promise<MusicTrack[]> {
+  return request<MusicTrack[]>("/music");
+}
+
+export function fetchMoments(): Promise<Moment[]> {
+  return request<Moment[]>("/moments");
+}
+
 // ---------------------------------------------------------------------------
 // 带降级的读取（页面直接调用这一层）
 // ---------------------------------------------------------------------------
@@ -146,6 +175,11 @@ export async function getHomeData(): Promise<DataResult<HomePayload>> {
 /** 站点配置。导航栏与页脚依赖它，因此同样需要降级。 */
 export async function getSite(): Promise<DataResult<SiteConfig>> {
   return withFallback(fetchSite, fallbackHome.site, "站点配置");
+}
+
+/** 个人资料。说说作者区与关于页共用；后端不可用时退回示例资料。 */
+export async function getProfile(): Promise<DataResult<Profile>> {
+  return withFallback(fetchProfile, fallbackHome.profile, "个人资料");
 }
 
 /** 单篇文章正文。后端不可用或 slug 不存在时退回示例文章。 */
@@ -162,16 +196,65 @@ export async function getRecentPosts(limit = 20): Promise<DataResult<PostSummary
   );
 }
 
-/** 杂谈列表。后端不可用时退回本地 fixture，保证页面始终有内容。 */
+/** 归档页与文章页相关推荐用的全部已发布文章。后端不可用时返回空列表。 */
+export async function getPublishedPosts(): Promise<DataResult<PostSummary[]>> {
+  return withFallback(() => fetchPosts(), [], "文章列表");
+}
+
+/** 照片集。后端不可用时返回空列表，由页面提示。 */
+export async function getAlbums(): Promise<DataResult<PhotoAlbum[]>> {
+  return withFallback<PhotoAlbum[]>(fetchAlbums, [], "照片集");
+}
+
+/** 项目矩阵。后端不可用时返回空列表，由页面提示。 */
+export async function getProjects(): Promise<DataResult<Project[]>> {
+  return withFallback<Project[]>(fetchProjects, [], "项目列表");
+}
+
+/** 友链。后端不可用时返回空列表，由页面提示。 */
+export async function getFriendLinks(): Promise<DataResult<FriendLink[]>> {
+  return withFallback<FriendLink[]>(fetchFriendLinks, [], "友链列表");
+}
+
+/** 音乐曲目。后端不可用时返回空列表，播放器显示空态。 */
+export async function getMusicTracks(): Promise<DataResult<MusicTrack[]>> {
+  return withFallback<MusicTrack[]>(fetchMusicTracks, [], "音乐曲目");
+}
+
+/** 生活动态。后端不可用时返回空列表，由页面提示。 */
+export async function getMoments(): Promise<DataResult<Moment[]>> {
+  return withFallback<Moment[]>(fetchMoments, [], "生活动态");
+}
+
+/**
+ * 从相册里随机挑一张照片，供首页相册精选使用。
+ *
+ * 只在服务端页面调用；返回 null 时首页渲染同尺寸占位卡。
+ */
+export function pickRandomSpotlight(albums: PhotoAlbum[]) {
+  const album = albums[Math.floor(Math.random() * albums.length)];
+  if (!album || album.photos.length === 0) return null;
+
+  const photo = album.photos[Math.floor(Math.random() * album.photos.length)];
+  return {
+    albumTitle: album.title,
+    albumDescription: album.description,
+    photoSrc: photo.src,
+    photoAlt: photo.alt,
+    photoCount: album.photos.length,
+  };
+}
+
+/** 杂谈列表。后端不可用时返回空列表，由页面提示。 */
 export async function getTalks(): Promise<DataResult<Talk[]>> {
-  return withFallback(fetchTalks, TALKS, "杂谈列表");
+  return withFallback<Talk[]>(fetchTalks, [], "杂谈列表");
 }
 
 /**
  * 杂谈详情。
  *
  * 404 视为“这篇确实不存在”，交给页面走 notFound；
- * 网络错误才退回同 slug 的 fixture，避免后端没启动时整页崩掉。
+ * 网络错误同样返回 null，不再拿本地示例内容冒充真实杂谈。
  */
 export async function getTalk(
   slug: string,
@@ -184,14 +267,10 @@ export async function getTalk(
     }
 
     console.warn(
-      `[api] 杂谈详情获取失败，已回退到本地示例数据。` +
-        `请确认后端已启动（${apiConfig.baseUrl}）。`,
+      `[api] 杂谈详情获取失败。请确认后端已启动（${apiConfig.baseUrl}）。`,
       error,
     );
-    return {
-      data: TALKS.find((talk) => talk.slug === slug) ?? null,
-      source: "fallback",
-    };
+    return { data: null, source: "fallback" };
   }
 }
 

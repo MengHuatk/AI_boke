@@ -41,8 +41,7 @@ export interface Profile {
 /**
  * 友链。
  *
- * 当前数据来自 lib/links-fixtures 的本地 fixture；后端接口接入后
- * 字段与后端保持一致，卡片与网格骨架不动。
+ * 数据来自后端 `/api/v1/links`；字段与后端 FriendLink 保持一致。
  */
 export interface FriendLink {
   id: string;
@@ -97,9 +96,8 @@ export interface HomePayload {
 /**
  * 单张照片。
  *
- * 照片集接入后端后，字段需与 backend 的照片接口保持一致；
- * width / height 用于 next/image 计算比例，也让瀑布流在图片加载前
- * 就能占住正确的高度。
+ * 数据来自后端 `/api/v1/albums`；width / height 用于 next/image
+ * 计算比例，也让瀑布流在图片加载前就能占住正确的高度。
  */
 export interface PhotoItem {
   id: string;
@@ -122,11 +120,25 @@ export interface PhotoAlbum {
   photos: PhotoItem[];
 }
 
+/** 项目卡片，数据来自后端 `/api/v1/projects` */
+export interface Project {
+  id: string;
+  /** GitHub 仓库标题 */
+  title: string;
+  /** README 首个标题行，卡片描述 */
+  readme_title: string;
+  /** 技术栈标签 */
+  tech_stack: string[];
+  /** GitHub 仓库地址 */
+  repo_url: string;
+  /** 可选：手动指定图标；留空则按 id 稳定选取 */
+  emoji: string;
+}
+
 /**
  * 说说（生活动态）。
  *
- * 当前数据来自 lib/moments-fixtures 的本地 fixture；后端接口接入后
- * 字段与后端保持一致，组件与布局骨架不动。
+ * 数据来自后端 `/api/v1/moments`；字段与后端 Moment 保持一致。
  */
 export interface MomentLocation {
   province: string;
@@ -162,8 +174,7 @@ export interface MomentAuthor {
 /**
  * 一篇杂谈。
  *
- * 当前数据来自 lib/talks-fixtures 的本地 fixture；后端接口接入后
- * 字段与后端保持一致，卡片与瀑布流骨架不动。
+ * 数据来自后端 `/api/v1/talks`；字段与后端 TalkSummary 保持一致。
  */
 export interface Talk {
   id: string;

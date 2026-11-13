@@ -6,10 +6,11 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { cn } from "@/lib/format";
 import {
+  coverBackground,
   formatDuration,
   type MusicTrack,
   type PlayOrder,
-} from "@/lib/music-fixtures";
+} from "@/lib/music";
 
 interface MusicPlayerProps {
   track: MusicTrack;
@@ -82,7 +83,7 @@ export function MusicPlayer({
         {/* 盘面外发光，随封面颜色变化 */}
         <div
           className="absolute size-[250px] rounded-full opacity-40 blur-3xl"
-          style={{ background: track.cover }}
+          style={{ background: coverBackground(track.cover) }}
         />
 
         <div
@@ -92,7 +93,7 @@ export function MusicPlayer({
           <div
             className="absolute inset-0 rounded-full"
             style={{
-              background: track.cover,
+              background: coverBackground(track.cover),
               maskImage: HOLE_MASK,
               WebkitMaskImage: HOLE_MASK,
             }}

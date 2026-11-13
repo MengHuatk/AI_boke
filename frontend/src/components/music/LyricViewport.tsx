@@ -7,7 +7,7 @@ import {
   findActiveLine,
   type MusicLyricLine,
   type MusicTrack,
-} from "@/lib/music-fixtures";
+} from "@/lib/music";
 
 /** 打字占一句时长的比例，尾巴留给光标停留与退格 */
 const TYPE_SHARE = 0.65;

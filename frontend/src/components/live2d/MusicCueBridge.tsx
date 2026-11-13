@@ -19,23 +19,24 @@ interface MusicCueBridgeProps {
  */
 export function MusicCueBridge({ enabled }: MusicCueBridgeProps) {
   const { track, playing, elapsed } = useMusic();
+  const trackId = track?.id ?? "";
   const previousRef = useRef(elapsed);
-  const trackIdRef = useRef(track.id);
+  const trackIdRef = useRef(trackId);
   const playingRef = useRef(false);
 
   useEffect(() => {
     const previous = previousRef.current;
-    const trackChanged = trackIdRef.current !== track.id;
+    const trackChanged = trackIdRef.current !== trackId;
     const started = !playingRef.current && playing;
 
-    trackIdRef.current = track.id;
+    trackIdRef.current = trackId;
     previousRef.current = elapsed;
     playingRef.current = playing;
 
-    // 切歌、暂停、模型未完成加载时只更新游标，不补发错过的台词
-    if (!enabled || !playing) return;
+    // 曲库为空、切歌、暂停、模型未完成加载时只更新游标，不补发错过的台词
+    if (!trackId || !enabled || !playing) return;
 
-    const cues = MUSIC_CUES[track.id];
+    const cues = MUSIC_CUES[trackId];
     if (!cues) return;
 
     // 0 秒台词在开始播放、切到本曲、或拖回开头时立刻触发；
@@ -53,7 +54,7 @@ export function MusicCueBridge({ enabled }: MusicCueBridgeProps) {
         );
       }
     }
-  }, [enabled, playing, elapsed, track.id]);
+  }, [enabled, playing, elapsed, trackId]);
 
   return null;
 }

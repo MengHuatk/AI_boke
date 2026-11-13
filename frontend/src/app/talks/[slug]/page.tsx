@@ -10,9 +10,8 @@ interface TalkPageProps {
 /**
  * 杂谈详情页（/talks/[slug]）——杂谈卡片点击的落点。
  *
- * 正文与相关推荐来自后端 /talks 接口；后端不可用时 getTalk 会退回同
- * slug 的本地 fixture。接口明确返回 404 时直接走全站 404，不拿示例
- * 内容冒充真实杂谈。
+ * 正文与相关推荐来自后端 /talks 接口；后端不可用时 getTalk 返回 null，
+ * 页面走 404，不再拿示例内容冒充真实杂谈。
  */
 export async function generateMetadata({ params }: TalkPageProps) {
   const { slug } = await params;

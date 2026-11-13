@@ -17,6 +17,7 @@ const PAUSED_LEVEL = 0.65;
 
 /** 雨势：开场留一点小雨，随播放进度线性涨到满 */
 function getRainLevel(elapsed: number, duration: number) {
+  if (duration <= 0) return 0;
   const progress = Math.min(1, Math.max(0, elapsed / duration));
   return 0.15 + 0.85 * progress;
 }

@@ -2,6 +2,7 @@
 
 import { useMusic } from "@/components/music/MusicProvider";
 import { LyricViewport } from "@/components/music/LyricViewport";
+import { coverBackground } from "@/lib/music";
 
 /**
  * 文章页右轨「正在播放」盒（320×210）。
@@ -15,6 +16,23 @@ import { LyricViewport } from "@/components/music/LyricViewport";
  */
 export function PostNowPlaying() {
   const { track, playing, elapsed } = useMusic();
+
+  if (!track) {
+    return (
+      <div
+        role="group"
+        aria-label="正在播放"
+        className="glass-panel-thick flex h-[210px] w-full shrink-0 flex-col justify-between rounded-glass px-6 py-5"
+      >
+        <span className="font-xiaowei text-[16px] leading-none tracking-[0.22em] text-white/85">
+          NOW PLAYING
+        </span>
+        <p className="font-yahei text-[13px] text-white/45">
+          还没有音乐，去后台添加曲目吧。
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -32,7 +50,7 @@ export function PostNowPlaying() {
           aria-hidden
           className="vinyl-spin grid size-[50px] shrink-0 place-items-center rounded-full border border-white/15 shadow-[inset_0_1px_0_0_rgb(255_255_255/0.25)]"
           style={{
-            background: track.cover,
+            background: coverBackground(track.cover),
             animationPlayState: playing ? "running" : "paused",
           }}
         >

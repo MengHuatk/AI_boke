@@ -26,7 +26,7 @@ FORMAT_EXTENSIONS = {
 
 
 def save_image(data: bytes) -> UploadResult:
-    """校验并保存一张图片，返回可公开访问的 URL 与原始尺寸。"""
+    """校验并保存一张图片，返回可公开访问的相对路径与原始尺寸。"""
     settings = get_settings()
 
     if len(data) > settings.upload_max_bytes:
@@ -66,6 +66,4 @@ def save_image(data: bytes) -> UploadResult:
     (target_dir / filename).write_bytes(data)
 
     path = f"{settings.upload_url_prefix}/{relative_dir.as_posix()}/{filename}"
-    base = settings.public_base_url.rstrip("/")
-    url = f"{base}{path}" if base else path
-    return UploadResult(url=url, width=width, height=height)
+    return UploadResult(url=path, width=width, height=height)

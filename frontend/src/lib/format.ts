@@ -46,7 +46,13 @@ export function cn(...classes: Array<string | false | null | undefined>): string
   return classes.filter(Boolean).join(" ");
 }
 
-/** 说说位置：省 · 市 · 区，卡片展示与搜索过滤共用同一份拼法 */
+/** 说说位置：省 · 市 · 区；缺项自动跳过，全空时给占位文案 */
 export function formatMomentLocation(location: MomentLocation): string {
-  return `${location.province} · ${location.city} · ${location.district}`;
+  const parts = [
+    location.province,
+    location.city,
+    location.district,
+  ].filter(Boolean);
+
+  return parts.length > 0 ? parts.join(" · ") : "未标注位置";
 }

@@ -30,7 +30,7 @@ export function Layout() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-30 border-b border-white/10 bg-ink-950/70 backdrop-blur-2xl">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-4 lg:px-8">
+        <div className="mx-auto flex min-h-16 w-full max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2 lg:px-8">
           <div className="flex items-center gap-2.5">
             <span className="grid size-8 place-items-center rounded-xl bg-brand-500/20 text-brand-200 ring-1 ring-brand-400/30">
               ✦
@@ -40,12 +40,27 @@ export function Layout() {
             </span>
           </div>
 
-          <nav className="flex items-center gap-1">
+          <nav className="flex flex-wrap items-center gap-1">
             <NavLink to="/posts" className={navClass}>
               文章
             </NavLink>
             <NavLink to="/talks" className={navClass}>
               杂谈
+            </NavLink>
+            <NavLink to="/moments" className={navClass}>
+              说说
+            </NavLink>
+            <NavLink to="/albums" className={navClass}>
+              照片
+            </NavLink>
+            <NavLink to="/projects" className={navClass}>
+              项目
+            </NavLink>
+            <NavLink to="/links" className={navClass}>
+              友链
+            </NavLink>
+            <NavLink to="/music" className={navClass}>
+              音乐
             </NavLink>
           </nav>
 

@@ -9,14 +9,34 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from app.models.schemas import (
+    AdminFriendLinkDetail,
+    AdminFriendLinkSummary,
+    AdminMomentDetail,
+    AdminMomentSummary,
+    AdminMusicTrackDetail,
+    AdminMusicTrackSummary,
+    AdminPhotoAlbumDetail,
+    AdminPhotoAlbumSummary,
     AdminPostDetail,
     AdminPostSummary,
+    AdminProjectDetail,
+    AdminProjectSummary,
     AdminTalkDetail,
     AdminTalkSummary,
+    FriendLink,
+    FriendLinkWrite,
+    Moment,
+    MomentWrite,
+    MusicTrack,
+    MusicTrackWrite,
+    PhotoAlbum,
+    PhotoAlbumWrite,
     PostDetail,
     PostSummary,
     PostWrite,
     Profile,
+    Project,
+    ProjectWrite,
     SiteConfig,
     SiteStats,
     TagStat,
@@ -70,6 +90,26 @@ class ContentRepository(ABC):
 
     @abstractmethod
     def get_talk(self, slug: str) -> TalkDetail | None: ...
+
+    # ---- 照片集 ----
+    @abstractmethod
+    def list_albums(self) -> list[PhotoAlbum]: ...
+
+    # ---- 项目 ----
+    @abstractmethod
+    def list_projects(self) -> list[Project]: ...
+
+    # ---- 友链 ----
+    @abstractmethod
+    def list_friend_links(self) -> list[FriendLink]: ...
+
+    # ---- 音乐 ----
+    @abstractmethod
+    def list_music_tracks(self) -> list[MusicTrack]: ...
+
+    # ---- 生活动态 ----
+    @abstractmethod
+    def list_moments(self) -> list[Moment]: ...
 
     # ---- 聚合数据 ----
     @abstractmethod
@@ -127,3 +167,138 @@ class AdminContentRepository(ContentRepository):
 
     @abstractmethod
     def delete_talk(self, talk_id: str) -> bool: ...
+
+    # ---- 照片集 ----
+    @abstractmethod
+    def list_admin_albums(
+        self,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[AdminPhotoAlbumSummary]: ...
+
+    @abstractmethod
+    def get_admin_album(self, album_id: str) -> AdminPhotoAlbumDetail | None: ...
+
+    @abstractmethod
+    def create_album(self, payload: PhotoAlbumWrite) -> AdminPhotoAlbumDetail: ...
+
+    @abstractmethod
+    def update_album(
+        self,
+        album_id: str,
+        payload: PhotoAlbumWrite,
+    ) -> AdminPhotoAlbumDetail | None: ...
+
+    @abstractmethod
+    def delete_album(self, album_id: str) -> bool: ...
+
+    # ---- 项目 ----
+    @abstractmethod
+    def list_admin_projects(
+        self,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[AdminProjectSummary]: ...
+
+    @abstractmethod
+    def get_admin_project(self, project_id: str) -> AdminProjectDetail | None: ...
+
+    @abstractmethod
+    def create_project(self, payload: ProjectWrite) -> AdminProjectDetail: ...
+
+    @abstractmethod
+    def update_project(
+        self,
+        project_id: str,
+        payload: ProjectWrite,
+    ) -> AdminProjectDetail | None: ...
+
+    @abstractmethod
+    def delete_project(self, project_id: str) -> bool: ...
+
+    # ---- 友链 ----
+    @abstractmethod
+    def list_admin_links(
+        self,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[AdminFriendLinkSummary]: ...
+
+    @abstractmethod
+    def get_admin_link(self, link_id: str) -> AdminFriendLinkDetail | None: ...
+
+    @abstractmethod
+    def create_link(self, payload: FriendLinkWrite) -> AdminFriendLinkDetail: ...
+
+    @abstractmethod
+    def update_link(
+        self,
+        link_id: str,
+        payload: FriendLinkWrite,
+    ) -> AdminFriendLinkDetail | None: ...
+
+    @abstractmethod
+    def delete_link(self, link_id: str) -> bool: ...
+
+    # ---- 音乐 ----
+    @abstractmethod
+    def list_admin_music_tracks(
+        self,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[AdminMusicTrackSummary]: ...
+
+    @abstractmethod
+    def get_admin_music_track(self, track_id: str) -> AdminMusicTrackDetail | None: ...
+
+    @abstractmethod
+    def create_music_track(self, payload: MusicTrackWrite) -> AdminMusicTrackDetail: ...
+
+    @abstractmethod
+    def update_music_track(
+        self,
+        track_id: str,
+        payload: MusicTrackWrite,
+    ) -> AdminMusicTrackDetail | None: ...
+
+    @abstractmethod
+    def delete_music_track(self, track_id: str) -> bool: ...
+
+    # ---- 生活动态 ----
+    @abstractmethod
+    def list_admin_moments(
+        self,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[AdminMomentSummary]: ...
+
+    @abstractmethod
+    def get_admin_moment(self, moment_id: str) -> AdminMomentDetail | None: ...
+
+    @abstractmethod
+    def create_moment(self, payload: MomentWrite) -> AdminMomentDetail: ...
+
+    @abstractmethod
+    def update_moment(
+        self,
+        moment_id: str,
+        payload: MomentWrite,
+    ) -> AdminMomentDetail | None: ...
+
+    @abstractmethod
+    def delete_moment(self, moment_id: str) -> bool: ...

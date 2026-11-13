@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { useMusic } from "@/components/music/MusicProvider";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/format";
-import { findActiveLine } from "@/lib/music-fixtures";
+import { coverBackground, findActiveLine } from "@/lib/music";
 
 /** 胶囊盒子的设计尺寸 */
 const BOX_WIDTH = 274;
@@ -65,12 +65,13 @@ export function MiniMusicPlayer() {
     offsetY: number;
   } | null>(null);
 
-  const activeLine = findActiveLine(track.lyrics, elapsed);
+  const activeLine = track ? findActiveLine(track.lyrics, elapsed) : -1;
   // 还没到第一句时也用第一句占位，避免显示乐队名
-  const lyric =
-    activeLine >= 0
+  const lyric = track
+    ? activeLine >= 0
       ? track.lyrics[activeLine].text
-      : (track.lyrics[0]?.text ?? track.artist);
+      : (track.lyrics[0]?.text ?? track.artist)
+    : "";
 
   // 首次定位完成前、以及身处首页时都保持隐藏
   const inactive = pathname === "/" || !ready;
@@ -138,6 +139,9 @@ export function MiniMusicPlayer() {
     }
   };
 
+  // 曲库为空时整块隐藏，不占用右上角空间
+  if (!track) return null;
+
   return (
     <div
       ref={boxRef}
@@ -161,7 +165,7 @@ export function MiniMusicPlayer() {
       <span
         aria-hidden="true"
         className="relative size-[42px] shrink-0 rounded-full border border-white/15 shadow-[inset_0_1px_0_0_rgb(255_255_255/0.25)]"
-        style={{ background: track.cover }}
+        style={{ background: coverBackground(track.cover) }}
       >
         <span className="absolute top-1/2 left-1/2 size-[6px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0a1424] ring-1 ring-white/30" />
       </span>

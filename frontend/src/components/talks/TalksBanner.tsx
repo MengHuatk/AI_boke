@@ -5,9 +5,8 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { TalkSearch } from "@/components/talks/TalkSearch";
 import { TalkTagBar } from "@/components/talks/TalkTagBar";
 import { TalkWall } from "@/components/talks/TalkWall";
+import { ALL_TALK_TAG } from "@/lib/talks";
 import type { Talk } from "@/lib/types";
-
-const ALL_TALK_TAG = "全部";
 
 /** 内容区与说说页一致：1200px 上限，窄屏留 1rem 边距，用负外边距破格居中 */
 const WIDE_WIDTH = "min(1200px, calc(100vw - 2rem))";
@@ -33,7 +32,7 @@ function getServerWideSnapshot() {
  * 杂谈页主体。
  *
  * 数据由服务端页面通过 /talks 接口取得后传入；接口不可用时页面层会
- * 退回本地 fixture，因此这里的筛选与动画逻辑不需要关心数据来源。
+ * 得到空列表并显示开发提示，因此这里的筛选与动画逻辑不需要关心数据来源。
  *
  * 自上而下：标题 → 副标题 → 512×58 搜索胶囊 → 标签区 → 三列 / 两列瀑布流。
  *

@@ -1,11 +1,13 @@
 "use client";
 
 import { Icon } from "@/components/ui/Icon";
-import { ALL_TAG } from "@/lib/archive-fixtures";
 import { cn } from "@/lib/format";
 
 /** 归档显示模式：grid = 矩形网格（ArchiveGrid），hub = 中枢链路（HubTimeline）。 */
 export type ArchiveViewMode = "grid" | "hub";
+
+/** 「不过滤任何文章」的伪标签，不参与数据派生，永远排在标签栏首位 */
+export const ALL_TAG = "全部档案";
 
 const VIEW_MODES = [
   { key: "hub", label: "中枢链路", icon: "link" },

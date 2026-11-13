@@ -1,12 +1,18 @@
 import type { NextConfig } from "next";
 
-// 上传图片由 FastAPI 提供，与公开站不同源；next/image 需要显式放行该源。
-// 地址与公开站调用后端用的 NEXT_PUBLIC_API_BASE_URL 保持一致。
+// 后端地址与公开站调用接口用的 NEXT_PUBLIC_API_BASE_URL 保持一致。
+// 上传图片以 /uploads/... 相对路径入库，由这里的 rewrite 代理到 FastAPI：
+// 浏览器和 next/image 都只看到本站同源地址，不受 Next 16 对
+// 本机/内网 IP 的图片优化限制。
 const apiUrl = new URL(
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1",
 );
 
 const nextConfig: NextConfig = {
+  // next dev 会往 frontend/AGENTS.md 追加要求读取 node_modules 的规则块，
+  // 与文件里既有的读取边界冲突；关闭自动生成，文件由项目维护。
+  agentRules: false,
+
   turbopack: {
     rules: {
       "*.css": {
@@ -16,15 +22,13 @@ const nextConfig: NextConfig = {
     },
   },
 
-  images: {
-    remotePatterns: [
+  async rewrites() {
+    return [
       {
-        protocol: apiUrl.protocol === "https:" ? "https" : "http",
-        hostname: apiUrl.hostname,
-        port: apiUrl.port,
-        pathname: "/uploads/**",
+        source: "/uploads/:path*",
+        destination: `${apiUrl.origin}/uploads/:path*`,
       },
-    ],
+    ];
   },
 
   // 开发模式左下角的路由徽标（Next 内置的 Dev Tools 指示器）挪到右下角，

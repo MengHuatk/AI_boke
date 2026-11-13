@@ -45,9 +45,8 @@ class Settings(BaseSettings):
     upload_dir: Path = BASE_DIR / "uploads"
     upload_url_prefix: str = "/uploads"
     upload_max_bytes: int = 5 * 1024 * 1024
-    # 上传接口返回的完整 URL 前缀。公开站与后端不同源时，必须是浏览器
-    # 能访问到的后端地址；留空则返回相对路径。
-    public_base_url: str = "http://127.0.0.1:8000"
+    # 音频文件通常远大于图片，单独给一个上限。
+    audio_upload_max_bytes: int = 30 * 1024 * 1024
 
     # ---- 跨域 ----
     cors_origins: list[str] = [

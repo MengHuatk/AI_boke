@@ -1,0 +1,18 @@
+[
+  {
+    "id": "blog-glass",
+    "title": "Glass Notes",
+    "readme_title": "一个把毛玻璃做到极致的个人博客",
+    "tech_stack": ["Next.js", "React", "Tailwind CSS"],
+    "repo_url": "https://github.com/MengHuatk/AI_boke",
+    "emoji": ""
+  },
+  {
+    "id": "island-demo",
+    "title": "Island Demo",
+    "readme_title": "仿造游戏islande官网制作的前端非官方网页",
+    "tech_stack": ["Less", "Vue"],
+    "repo_url": "https://github.com/MengHuatk/island_demo",
+    "emoji": ""
+  }
+]

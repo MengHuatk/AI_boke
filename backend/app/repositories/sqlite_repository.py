@@ -17,20 +17,54 @@ from pathlib import Path
 from typing import Any, cast
 from uuid import uuid4
 
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
-from app.db.models import Post, Talk
+from app.db.models import (
+    FriendLink,
+    Moment as MomentRow,
+    MusicTrack as MusicTrackRow,
+    PhotoAlbum,
+    PhotoItem,
+    Post,
+    Project,
+    Talk,
+)
 from app.models.schemas import (
+    AdminFriendLinkDetail,
+    AdminFriendLinkSummary,
+    AdminMomentDetail,
+    AdminMomentSummary,
+    AdminMusicTrackDetail,
+    AdminMusicTrackSummary,
+    AdminPhotoAlbumDetail,
+    AdminPhotoAlbumSummary,
     AdminPostDetail,
     AdminPostSummary,
+    AdminProjectDetail,
+    AdminProjectSummary,
     AdminTalkDetail,
     AdminTalkSummary,
+    ContentStatus,
+    FriendLink as FriendLinkSchema,
+    FriendLinkWrite,
+    Moment as MomentSchema,
+    MomentImage,
+    MomentLocation,
+    MomentWrite,
+    MusicLyricLine,
+    MusicTrack as MusicTrackSchema,
+    MusicTrackWrite,
+    PhotoAlbum as PhotoAlbumSchema,
+    PhotoAlbumWrite,
+    PhotoItem as PhotoItemSchema,
     PostDetail,
     PostSummary,
     PostWrite,
     Profile,
+    Project as ProjectSchema,
+    ProjectWrite,
     SiteConfig,
     SiteStats,
     TagStat,
@@ -74,7 +108,7 @@ def normalize_excerpt(excerpt: str, body: str) -> str:
 
 
 def resolve_published_at(
-    payload: PostWrite | TalkWrite,
+    payload: PostWrite | TalkWrite | MomentWrite,
     current: datetime | None,
 ) -> datetime | None:
     """显式日期优先；首次发布自动补当前时间；取消发布保留原日期。"""
@@ -183,6 +217,50 @@ class SqliteContentRepository(AdminContentRepository):
         statement = select(Talk).where(Talk.slug == slug, Talk.status == "published")
         row = self._session.scalar(statement)
         return self._talk_detail(row) if row is not None else None
+
+    # ------------------------------------------------------------------
+    # 公开照片集 / 项目 / 友链
+    # ------------------------------------------------------------------
+    def list_albums(self) -> list[PhotoAlbumSchema]:
+        statement = (
+            select(PhotoAlbum)
+            .where(PhotoAlbum.status == "published")
+            .options(selectinload(PhotoAlbum.photos))
+            .order_by(PhotoAlbum.sort_order, PhotoAlbum.created_at.desc())
+        )
+        return [self._album_public(row) for row in self._session.scalars(statement)]
+
+    def list_projects(self) -> list[ProjectSchema]:
+        statement = (
+            select(Project)
+            .where(Project.status == "published")
+            .order_by(Project.sort_order, Project.created_at.desc())
+        )
+        return [self._project_public(row) for row in self._session.scalars(statement)]
+
+    def list_friend_links(self) -> list[FriendLinkSchema]:
+        statement = (
+            select(FriendLink)
+            .where(FriendLink.status == "published")
+            .order_by(FriendLink.sort_order, FriendLink.created_at.desc())
+        )
+        return [self._friend_link_public(row) for row in self._session.scalars(statement)]
+
+    def list_music_tracks(self) -> list[MusicTrackSchema]:
+        statement = (
+            select(MusicTrackRow)
+            .where(MusicTrackRow.status == "published")
+            .order_by(MusicTrackRow.sort_order, MusicTrackRow.created_at.desc())
+        )
+        return [self._music_track_public(row) for row in self._session.scalars(statement)]
+
+    def list_moments(self) -> list[MomentSchema]:
+        statement = (
+            select(MomentRow)
+            .where(MomentRow.status == "published")
+            .order_by(MomentRow.published_at.desc())
+        )
+        return [self._moment_public(row) for row in self._session.scalars(statement)]
 
     # ------------------------------------------------------------------
     # 聚合数据（只统计已发布文章，口径与旧实现一致）
@@ -336,6 +414,387 @@ class SqliteContentRepository(AdminContentRepository):
         return True
 
     # ------------------------------------------------------------------
+    # 后台照片集
+    # ------------------------------------------------------------------
+    def list_admin_albums(
+        self,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[AdminPhotoAlbumSummary]:
+        statement = select(PhotoAlbum).options(selectinload(PhotoAlbum.photos))
+
+        if status:
+            statement = statement.where(PhotoAlbum.status == status)
+        if query:
+            needle = f"%{query.strip()}%"
+            statement = statement.where(
+                or_(
+                    PhotoAlbum.title.ilike(needle),
+                    PhotoAlbum.description.ilike(needle),
+                    PhotoAlbum.slug.ilike(needle),
+                )
+            )
+
+        statement = (
+            statement.order_by(PhotoAlbum.sort_order, PhotoAlbum.updated_at.desc())
+            .offset(offset)
+        )
+        if limit is not None:
+            statement = statement.limit(limit)
+
+        return [
+            self._admin_album_summary(row)
+            for row in self._session.scalars(statement)
+        ]
+
+    def get_admin_album(self, album_id: str) -> AdminPhotoAlbumDetail | None:
+        statement = (
+            select(PhotoAlbum)
+            .where(PhotoAlbum.id == album_id)
+            .options(selectinload(PhotoAlbum.photos))
+        )
+        row = self._session.scalar(statement)
+        return self._admin_album_detail(row) if row is not None else None
+
+    def create_album(self, payload: PhotoAlbumWrite) -> AdminPhotoAlbumDetail:
+        row = PhotoAlbum(
+            id=uuid4().hex,
+            sort_order=self._next_sort_order(PhotoAlbum),
+        )
+        self._apply_album_fields(row, payload)
+        self._session.add(row)
+        self._commit(payload.slug)
+        self._session.refresh(row)
+        return self._admin_album_detail(row)
+
+    def update_album(
+        self,
+        album_id: str,
+        payload: PhotoAlbumWrite,
+    ) -> AdminPhotoAlbumDetail | None:
+        row = self._session.get(PhotoAlbum, album_id)
+        if row is None:
+            return None
+
+        self._apply_album_fields(row, payload)
+        self._commit(payload.slug)
+        self._session.refresh(row)
+        return self._admin_album_detail(row)
+
+    def delete_album(self, album_id: str) -> bool:
+        row = self._session.get(PhotoAlbum, album_id)
+        if row is None:
+            return False
+
+        self._session.delete(row)
+        self._session.commit()
+        return True
+
+    # ------------------------------------------------------------------
+    # 后台项目
+    # ------------------------------------------------------------------
+    def list_admin_projects(
+        self,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[AdminProjectSummary]:
+        statement = select(Project)
+
+        if status:
+            statement = statement.where(Project.status == status)
+        if query:
+            needle = f"%{query.strip()}%"
+            statement = statement.where(
+                or_(
+                    Project.title.ilike(needle),
+                    Project.readme_title.ilike(needle),
+                    Project.repo_url.ilike(needle),
+                )
+            )
+
+        statement = (
+            statement.order_by(Project.sort_order, Project.updated_at.desc())
+            .offset(offset)
+        )
+        if limit is not None:
+            statement = statement.limit(limit)
+
+        return [
+            self._admin_project_summary(row)
+            for row in self._session.scalars(statement)
+        ]
+
+    def get_admin_project(self, project_id: str) -> AdminProjectDetail | None:
+        row = self._session.get(Project, project_id)
+        return self._admin_project_detail(row) if row is not None else None
+
+    def create_project(self, payload: ProjectWrite) -> AdminProjectDetail:
+        row = Project(
+            id=uuid4().hex,
+            sort_order=self._next_sort_order(Project),
+        )
+        self._apply_project_fields(row, payload)
+        self._session.add(row)
+        self._session.commit()
+        self._session.refresh(row)
+        return self._admin_project_detail(row)
+
+    def update_project(
+        self,
+        project_id: str,
+        payload: ProjectWrite,
+    ) -> AdminProjectDetail | None:
+        row = self._session.get(Project, project_id)
+        if row is None:
+            return None
+
+        self._apply_project_fields(row, payload)
+        self._session.commit()
+        self._session.refresh(row)
+        return self._admin_project_detail(row)
+
+    def delete_project(self, project_id: str) -> bool:
+        row = self._session.get(Project, project_id)
+        if row is None:
+            return False
+
+        self._session.delete(row)
+        self._session.commit()
+        return True
+
+    # ------------------------------------------------------------------
+    # 后台友链
+    # ------------------------------------------------------------------
+    def list_admin_links(
+        self,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[AdminFriendLinkSummary]:
+        statement = select(FriendLink)
+
+        if status:
+            statement = statement.where(FriendLink.status == status)
+        if query:
+            needle = f"%{query.strip()}%"
+            statement = statement.where(
+                or_(
+                    FriendLink.name.ilike(needle),
+                    FriendLink.bio.ilike(needle),
+                    FriendLink.href.ilike(needle),
+                )
+            )
+
+        statement = (
+            statement.order_by(FriendLink.sort_order, FriendLink.updated_at.desc())
+            .offset(offset)
+        )
+        if limit is not None:
+            statement = statement.limit(limit)
+
+        return [
+            self._admin_link_summary(row)
+            for row in self._session.scalars(statement)
+        ]
+
+    def get_admin_link(self, link_id: str) -> AdminFriendLinkDetail | None:
+        row = self._session.get(FriendLink, link_id)
+        return self._admin_link_detail(row) if row is not None else None
+
+    def create_link(self, payload: FriendLinkWrite) -> AdminFriendLinkDetail:
+        row = FriendLink(
+            id=uuid4().hex,
+            sort_order=self._next_sort_order(FriendLink),
+        )
+        self._apply_link_fields(row, payload)
+        self._session.add(row)
+        self._session.commit()
+        self._session.refresh(row)
+        return self._admin_link_detail(row)
+
+    def update_link(
+        self,
+        link_id: str,
+        payload: FriendLinkWrite,
+    ) -> AdminFriendLinkDetail | None:
+        row = self._session.get(FriendLink, link_id)
+        if row is None:
+            return None
+
+        self._apply_link_fields(row, payload)
+        self._session.commit()
+        self._session.refresh(row)
+        return self._admin_link_detail(row)
+
+    def delete_link(self, link_id: str) -> bool:
+        row = self._session.get(FriendLink, link_id)
+        if row is None:
+            return False
+
+        self._session.delete(row)
+        self._session.commit()
+        return True
+
+    # ------------------------------------------------------------------
+    # 后台音乐
+    # ------------------------------------------------------------------
+    def list_admin_music_tracks(
+        self,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[AdminMusicTrackSummary]:
+        statement = select(MusicTrackRow)
+
+        if status:
+            statement = statement.where(MusicTrackRow.status == status)
+        if query:
+            needle = f"%{query.strip()}%"
+            statement = statement.where(
+                or_(
+                    MusicTrackRow.title.ilike(needle),
+                    MusicTrackRow.artist.ilike(needle),
+                )
+            )
+
+        statement = (
+            statement.order_by(
+                MusicTrackRow.sort_order,
+                MusicTrackRow.updated_at.desc(),
+            ).offset(offset)
+        )
+        if limit is not None:
+            statement = statement.limit(limit)
+
+        return [
+            self._admin_music_track_summary(row)
+            for row in self._session.scalars(statement)
+        ]
+
+    def get_admin_music_track(
+        self,
+        track_id: str,
+    ) -> AdminMusicTrackDetail | None:
+        row = self._session.get(MusicTrackRow, track_id)
+        return self._admin_music_track_detail(row) if row is not None else None
+
+    def create_music_track(
+        self,
+        payload: MusicTrackWrite,
+    ) -> AdminMusicTrackDetail:
+        row = MusicTrackRow(
+            id=uuid4().hex,
+            sort_order=self._next_sort_order(MusicTrackRow),
+        )
+        self._apply_music_track_fields(row, payload)
+        self._session.add(row)
+        self._session.commit()
+        self._session.refresh(row)
+        return self._admin_music_track_detail(row)
+
+    def update_music_track(
+        self,
+        track_id: str,
+        payload: MusicTrackWrite,
+    ) -> AdminMusicTrackDetail | None:
+        row = self._session.get(MusicTrackRow, track_id)
+        if row is None:
+            return None
+
+        self._apply_music_track_fields(row, payload)
+        self._session.commit()
+        self._session.refresh(row)
+        return self._admin_music_track_detail(row)
+
+    def delete_music_track(self, track_id: str) -> bool:
+        row = self._session.get(MusicTrackRow, track_id)
+        if row is None:
+            return False
+
+        self._session.delete(row)
+        self._session.commit()
+        return True
+
+    # ------------------------------------------------------------------
+    # 后台生活动态
+    # ------------------------------------------------------------------
+    def list_admin_moments(
+        self,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[AdminMomentSummary]:
+        statement = select(MomentRow)
+
+        if status:
+            statement = statement.where(MomentRow.status == status)
+        if query:
+            statement = statement.where(
+                MomentRow.content.ilike(f"%{query.strip()}%")
+            )
+
+        statement = (
+            statement.order_by(
+                MomentRow.published_at.desc(),
+                MomentRow.updated_at.desc(),
+            ).offset(offset)
+        )
+        if limit is not None:
+            statement = statement.limit(limit)
+
+        return [
+            self._admin_moment_summary(row)
+            for row in self._session.scalars(statement)
+        ]
+
+    def get_admin_moment(self, moment_id: str) -> AdminMomentDetail | None:
+        row = self._session.get(MomentRow, moment_id)
+        return self._admin_moment_detail(row) if row is not None else None
+
+    def create_moment(self, payload: MomentWrite) -> AdminMomentDetail:
+        row = MomentRow(id=uuid4().hex)
+        self._apply_moment_fields(row, payload)
+        self._session.add(row)
+        self._session.commit()
+        self._session.refresh(row)
+        return self._admin_moment_detail(row)
+
+    def update_moment(
+        self,
+        moment_id: str,
+        payload: MomentWrite,
+    ) -> AdminMomentDetail | None:
+        row = self._session.get(MomentRow, moment_id)
+        if row is None:
+            return None
+
+        self._apply_moment_fields(row, payload)
+        self._session.commit()
+        self._session.refresh(row)
+        return self._admin_moment_detail(row)
+
+    def delete_moment(self, moment_id: str) -> bool:
+        row = self._session.get(MomentRow, moment_id)
+        if row is None:
+            return False
+
+        self._session.delete(row)
+        self._session.commit()
+        return True
+
+    # ------------------------------------------------------------------
     # 内部工具
     # ------------------------------------------------------------------
     def _commit(self, slug: str) -> None:
@@ -368,6 +827,234 @@ class SqliteContentRepository(AdminContentRepository):
         row.status = payload.status
         row.reading_minutes = estimate_reading_minutes(payload.body)
         row.published_at = resolve_published_at(payload, row.published_at)
+
+    def _next_sort_order(self, model: Any) -> int:
+        """新建内容默认排在已有内容之后。"""
+        current = self._session.scalar(select(func.max(model.sort_order)))
+        return (current or 0) + 1
+
+    def _apply_album_fields(self, row: PhotoAlbum, payload: PhotoAlbumWrite) -> None:
+        row.slug = payload.slug
+        row.title = payload.title
+        row.description = payload.description
+        row.created_at = payload.created_at
+        row.status = payload.status
+        row.photos = [
+            PhotoItem(
+                id=uuid4().hex,
+                src=photo.src,
+                alt=photo.alt,
+                title=photo.title,
+                width=photo.width,
+                height=photo.height,
+                sort_order=index,
+            )
+            for index, photo in enumerate(payload.photos)
+        ]
+
+    def _apply_project_fields(self, row: Project, payload: ProjectWrite) -> None:
+        row.title = payload.title
+        row.readme_title = payload.readme_title
+        row.tech_stack = normalize_tags(payload.tech_stack)
+        row.repo_url = payload.repo_url
+        row.emoji = payload.emoji.strip()
+        row.status = payload.status
+
+    def _apply_link_fields(self, row: FriendLink, payload: FriendLinkWrite) -> None:
+        row.name = payload.name
+        row.avatar = payload.avatar
+        row.bio = payload.bio
+        row.href = payload.href
+        row.status = payload.status
+
+    def _apply_music_track_fields(
+        self,
+        row: MusicTrackRow,
+        payload: MusicTrackWrite,
+    ) -> None:
+        row.title = payload.title
+        row.artist = payload.artist
+        row.duration = payload.duration
+        row.cover = payload.cover
+        row.audio_url = payload.audio_url
+        row.lyrics = [line.model_dump() for line in payload.lyrics]
+        row.status = payload.status
+
+    def _apply_moment_fields(self, row: MomentRow, payload: MomentWrite) -> None:
+        row.content = payload.content
+        row.images = [image.model_dump() for image in payload.images]
+        row.location = payload.location.model_dump()
+        row.status = payload.status
+        row.published_at = resolve_published_at(payload, row.published_at)
+
+    @staticmethod
+    def _photo_item(row: PhotoItem) -> PhotoItemSchema:
+        return PhotoItemSchema(
+            id=row.id,
+            src=row.src,
+            alt=row.alt,
+            title=row.title,
+            width=row.width,
+            height=row.height,
+        )
+
+    @classmethod
+    def _album_public(cls, row: PhotoAlbum) -> PhotoAlbumSchema:
+        return PhotoAlbumSchema(
+            id=row.id,
+            slug=row.slug,
+            title=row.title,
+            description=row.description,
+            created_at=row.created_at,
+            photos=[cls._photo_item(photo) for photo in row.photos],
+        )
+
+    @classmethod
+    def _admin_album_summary(cls, row: PhotoAlbum) -> AdminPhotoAlbumSummary:
+        return AdminPhotoAlbumSummary(
+            id=row.id,
+            slug=row.slug,
+            title=row.title,
+            description=row.description,
+            created_at=row.created_at,
+            status=cast(ContentStatus, row.status),
+            sort_order=row.sort_order,
+            photo_count=len(row.photos),
+            cover=row.photos[0].src if row.photos else None,
+            updated_at=row.updated_at,
+        )
+
+    @classmethod
+    def _admin_album_detail(cls, row: PhotoAlbum) -> AdminPhotoAlbumDetail:
+        return AdminPhotoAlbumDetail(
+            **cls._admin_album_summary(row).model_dump(),
+            photos=[cls._photo_item(photo) for photo in row.photos],
+        )
+
+    @staticmethod
+    def _project_public(row: Project) -> ProjectSchema:
+        return ProjectSchema(
+            id=row.id,
+            title=row.title,
+            readme_title=row.readme_title,
+            tech_stack=list(row.tech_stack),
+            repo_url=row.repo_url,
+            emoji=row.emoji,
+        )
+
+    @classmethod
+    def _admin_project_summary(cls, row: Project) -> AdminProjectSummary:
+        return AdminProjectSummary(
+            **cls._project_public(row).model_dump(),
+            status=cast(ContentStatus, row.status),
+            sort_order=row.sort_order,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @classmethod
+    def _admin_project_detail(cls, row: Project) -> AdminProjectDetail:
+        return AdminProjectDetail(**cls._admin_project_summary(row).model_dump())
+
+    @staticmethod
+    def _friend_link_public(row: FriendLink) -> FriendLinkSchema:
+        return FriendLinkSchema(
+            id=row.id,
+            name=row.name,
+            avatar=row.avatar,
+            bio=row.bio,
+            href=row.href,
+        )
+
+    @classmethod
+    def _admin_link_summary(cls, row: FriendLink) -> AdminFriendLinkSummary:
+        return AdminFriendLinkSummary(
+            **cls._friend_link_public(row).model_dump(),
+            status=cast(ContentStatus, row.status),
+            sort_order=row.sort_order,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @classmethod
+    def _admin_link_detail(cls, row: FriendLink) -> AdminFriendLinkDetail:
+        return AdminFriendLinkDetail(**cls._admin_link_summary(row).model_dump())
+
+    @staticmethod
+    def _music_track_public(row: MusicTrackRow) -> MusicTrackSchema:
+        return MusicTrackSchema(
+            id=row.id,
+            title=row.title,
+            artist=row.artist,
+            duration=row.duration,
+            cover=row.cover,
+            audio_url=row.audio_url,
+            lyrics=[MusicLyricLine.model_validate(line) for line in row.lyrics],
+        )
+
+    @classmethod
+    def _admin_music_track_summary(
+        cls,
+        row: MusicTrackRow,
+    ) -> AdminMusicTrackSummary:
+        return AdminMusicTrackSummary(
+            id=row.id,
+            title=row.title,
+            artist=row.artist,
+            duration=row.duration,
+            cover=row.cover,
+            audio_url=row.audio_url,
+            lyric_count=len(row.lyrics),
+            status=cast(ContentStatus, row.status),
+            sort_order=row.sort_order,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @classmethod
+    def _admin_music_track_detail(
+        cls,
+        row: MusicTrackRow,
+    ) -> AdminMusicTrackDetail:
+        return AdminMusicTrackDetail(
+            **cls._admin_music_track_summary(row).model_dump(),
+            lyrics=[MusicLyricLine.model_validate(line) for line in row.lyrics],
+        )
+
+    @staticmethod
+    def _moment_images(row: MomentRow) -> list[MomentImage]:
+        return [MomentImage.model_validate(image) for image in row.images]
+
+    @staticmethod
+    def _moment_location(row: MomentRow) -> MomentLocation:
+        return MomentLocation.model_validate(row.location)
+
+    @classmethod
+    def _moment_public(cls, row: MomentRow) -> MomentSchema:
+        return MomentSchema(
+            id=row.id,
+            content=row.content,
+            images=cls._moment_images(row),
+            location=cls._moment_location(row),
+            published_at=cast(datetime, row.published_at),
+        )
+
+    @classmethod
+    def _admin_moment_summary(cls, row: MomentRow) -> AdminMomentSummary:
+        return AdminMomentSummary(
+            id=row.id,
+            content=row.content,
+            images=cls._moment_images(row),
+            location=cls._moment_location(row),
+            status=cast(ContentStatus, row.status),
+            published_at=row.published_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @classmethod
+    def _admin_moment_detail(cls, row: MomentRow) -> AdminMomentDetail:
+        return AdminMomentDetail(**cls._admin_moment_summary(row).model_dump())
 
     @staticmethod
     def _post_summary(row: Post) -> PostSummary:

@@ -39,11 +39,17 @@ export function LinksBanner({ friends }: LinksBannerProps) {
         </p>
       </header>
 
-      <ul className="grid grid-cols-2 justify-items-center gap-x-4 gap-y-6 sm:gap-8 lg:grid-cols-3">
-        {friends.map((friend, index) => (
-          <FriendCard key={friend.id} friend={friend} index={index} />
-        ))}
-      </ul>
+      {friends.length > 0 ? (
+        <ul className="grid grid-cols-2 justify-items-center gap-x-4 gap-y-6 sm:gap-8 lg:grid-cols-3">
+          {friends.map((friend, index) => (
+            <FriendCard key={friend.id} friend={friend} index={index} />
+          ))}
+        </ul>
+      ) : (
+        <p className="glass-panel-subtle flex h-40 items-center justify-center rounded-glass text-sm text-white/50">
+          还没有友链，去后台添加一条吧
+        </p>
+      )}
     </section>
   );
 }
