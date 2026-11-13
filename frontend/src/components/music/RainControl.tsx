@@ -216,13 +216,13 @@ export function RainControl() {
         aria-label="雨幕设置"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="keep-light relative grid size-11 place-items-center rounded-full border border-white/15 bg-[#0a1424]/85 text-white/85 shadow-[0_12px_30px_-14px_rgb(0_0_0/0.9)] backdrop-blur-md transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
+        className="floating-control relative grid size-11 place-items-center rounded-full transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
       >
         <Icon name="rain" size={20} />
         <span
           className={cn(
             "absolute right-1.5 bottom-1.5 size-1.5 rounded-full",
-            rainOn ? "bg-emerald-300" : "bg-white/30",
+            rainOn ? "bg-emerald-300" : "rain-status-dot-off bg-white/30",
           )}
         />
       </button>

@@ -11,7 +11,10 @@
 
 import { apiConfig, uiConfig } from "@/lib/config";
 import { fallbackHome, fallbackPostDetail } from "@/lib/fallback";
+import { TALKS } from "@/lib/talks-fixtures";
 import type {
+  AnonChatReply,
+  AnonChatTurn,
   DataResult,
   HomePayload,
   PostDetail,
@@ -19,6 +22,8 @@ import type {
   SiteConfig,
   SiteStats,
   TagStat,
+  Talk,
+  TalkDetail,
 } from "@/lib/types";
 
 /** 接口调用失败（网络错误、超时、非 2xx）时抛出 */
@@ -107,6 +112,24 @@ export function fetchTags(): Promise<TagStat[]> {
   return request<TagStat[]>("/tags");
 }
 
+export function fetchTalks(params: {
+  tag?: string;
+  limit?: number;
+  offset?: number;
+} = {}): Promise<Talk[]> {
+  const query = new URLSearchParams();
+  if (params.tag) query.set("tag", params.tag);
+  if (params.limit !== undefined) query.set("limit", String(params.limit));
+  if (params.offset !== undefined) query.set("offset", String(params.offset));
+
+  const suffix = query.size > 0 ? `?${query}` : "";
+  return request<Talk[]>(`/talks${suffix}`);
+}
+
+export function fetchTalk(slug: string): Promise<TalkDetail> {
+  return request<TalkDetail>(`/talks/${encodeURIComponent(slug)}`);
+}
+
 export function fetchStats(): Promise<SiteStats> {
   return request<SiteStats>("/stats");
 }
@@ -137,4 +160,74 @@ export async function getRecentPosts(limit = 20): Promise<DataResult<PostSummary
     fallbackHome.featured_posts,
     "文章列表",
   );
+}
+
+/** 杂谈列表。后端不可用时退回本地 fixture，保证页面始终有内容。 */
+export async function getTalks(): Promise<DataResult<Talk[]>> {
+  return withFallback(fetchTalks, TALKS, "杂谈列表");
+}
+
+/**
+ * 杂谈详情。
+ *
+ * 404 视为“这篇确实不存在”，交给页面走 notFound；
+ * 网络错误才退回同 slug 的 fixture，避免后端没启动时整页崩掉。
+ */
+export async function getTalk(
+  slug: string,
+): Promise<DataResult<TalkDetail | null>> {
+  try {
+    return { data: await fetchTalk(slug), source: "api" };
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return { data: null, source: "api" };
+    }
+
+    console.warn(
+      `[api] 杂谈详情获取失败，已回退到本地示例数据。` +
+        `请确认后端已启动（${apiConfig.baseUrl}）。`,
+      error,
+    );
+    return {
+      data: TALKS.find((talk) => talk.slug === slug) ?? null,
+      source: "fallback",
+    };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 看板娘 AI 对话
+// ---------------------------------------------------------------------------
+
+/**
+ * 发送一轮对话。
+ *
+ * 聊天失败必须让用户看见，不能像内容读取那样退回示例数据，
+ * 否则会出现「示例回答冒充 AI」的情况，所以这里不做 fallback。
+ */
+export async function sendAnonChat(
+  message: string,
+  history: AnonChatTurn[] = [],
+): Promise<AnonChatReply> {
+  const url = `${apiConfig.baseUrl}/chat`;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ message, history }),
+      signal: AbortSignal.timeout(apiConfig.chatTimeoutMs),
+      cache: "no-store",
+    });
+  } catch (cause) {
+    const reason = cause instanceof Error ? cause.message : String(cause);
+    throw new ApiError(`请求失败: ${url}（${reason}）`, undefined, url);
+  }
+
+  if (!response.ok) {
+    throw new ApiError(`接口返回 ${response.status}: ${url}`, response.status, url);
+  }
+
+  return (await response.json()) as AnonChatReply;
 }

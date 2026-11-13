@@ -229,7 +229,7 @@ export function CircleNav({ site, pathname }: CircleNavProps) {
             onTransitionEnd={onDrumTransitionEnd}
           >
             {/* 500px 外框 */}
-            <div className="absolute inset-0 rounded-full bg-[#262C30A0] shadow-[inset_0_0_60px_rgba(0,0,0,0.45)] border-1 border-[#50636B]" />
+            <div className="circle-nav-drum absolute inset-0 rounded-full bg-[#262C30A0] shadow-[inset_0_0_60px_rgba(0,0,0,0.45)] border-1 border-[#50636B]" />
 
             {/* 旋转层：只转这一层，路由圆点挂在上面跟转 */}
             <div
@@ -253,9 +253,9 @@ export function CircleNav({ site, pathname }: CircleNavProps) {
                     <SmartLink
                       href={item.href}
                       className={cn(
-                        "absolute left-1/2 grid place-items-center rounded-full px-1 text-center text-xs leading-tight transition-colors duration-200",
+                        "circle-nav-item absolute left-1/2 grid place-items-center rounded-full px-1 text-center text-xs leading-tight transition-colors duration-200",
                         active
-                          ? "bg-[#5C57FF] text-white shadow-[0_0_14px_rgba(92,87,255,0.75)]"
+                          ? "circle-nav-item-active bg-[#5C57FF] text-white shadow-[0_0_14px_rgba(92,87,255,0.75)]"
                           : "bg-[#272730] text-white/85 border-1 border-[#404052]"
                       )}
                       style={{
@@ -275,8 +275,8 @@ export function CircleNav({ site, pathname }: CircleNavProps) {
 
             {/* 中心取消钮：80/70 两层静止环 + 50px 按钮，hover 变红自转 90° */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <div className="grid size-[78px] place-items-center rounded-full bg-[#5F6B94]">
-                <div className="grid size-[70px] place-items-center rounded-full bg-[#3C3C4D]">
+              <div className="circle-nav-ring-outer grid size-[78px] place-items-center rounded-full bg-[#5F6B94]">
+                <div className="circle-nav-ring-inner grid size-[70px] place-items-center rounded-full bg-[#3C3C4D]">
                   <button
                     type="button"
                     aria-label="关闭导航"

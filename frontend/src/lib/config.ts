@@ -21,6 +21,9 @@ export const apiConfig = {
 
   /** 单请求超时（毫秒），超时后回退到本地示例数据 */
   timeoutMs: readNumber(process.env.NEXT_PUBLIC_API_TIMEOUT_MS, 2500),
+
+  /** AI 对话超时（毫秒）。要比后端 BLOG_AI_TIMEOUT 长，给网络留余量 */
+  chatTimeoutMs: readNumber(process.env.NEXT_PUBLIC_AI_TIMEOUT_MS, 40000),
 } as const;
 
 export const uiConfig = {

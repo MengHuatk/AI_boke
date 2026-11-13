@@ -1,8 +1,8 @@
 {
   "name": "梦华",
-  "avatar": "/avatar.svg",
-  "headline": "全栈工程师 · 独立开发者",
-  "bio": "一位努力生活在普通中的普通人",
-  "location": "杭州",
+  "avatar": "/avatar.jpg",
+  "headline": "AI工程师 · 独立开发者",
+  "bio": "一颗在生活中的迷途之星",
+  "location": "四川",
   "skills": ["TypeScript", "React", "Next.js", "Python", "FastAPI", "Tailwind CSS"]
 }

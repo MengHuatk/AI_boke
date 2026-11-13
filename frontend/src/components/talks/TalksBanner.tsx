@@ -5,7 +5,9 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { TalkSearch } from "@/components/talks/TalkSearch";
 import { TalkTagBar } from "@/components/talks/TalkTagBar";
 import { TalkWall } from "@/components/talks/TalkWall";
-import { ALL_TALK_TAG, TALK_TAGS, TALKS } from "@/lib/talks-fixtures";
+import type { Talk } from "@/lib/types";
+
+const ALL_TALK_TAG = "全部";
 
 /** 内容区与说说页一致：1200px 上限，窄屏留 1rem 边距，用负外边距破格居中 */
 const WIDE_WIDTH = "min(1200px, calc(100vw - 2rem))";
@@ -30,6 +32,9 @@ function getServerWideSnapshot() {
 /**
  * 杂谈页主体。
  *
+ * 数据由服务端页面通过 /talks 接口取得后传入；接口不可用时页面层会
+ * 退回本地 fixture，因此这里的筛选与动画逻辑不需要关心数据来源。
+ *
  * 自上而下：标题 → 副标题 → 512×58 搜索胶囊 → 标签区 → 三列 / 两列瀑布流。
  *
  * 标签切换立即播 FLIP；搜索输入保留即时值，停止输入 220ms 后才应用
@@ -40,7 +45,7 @@ function getServerWideSnapshot() {
  * 首访错峰入场只播一次：1.5s 后摘掉 view-rise / view-fade，后续筛选
  * 不会再被入场动画干扰。
  */
-export function TalksBanner() {
+export function TalksBanner({ talks }: { talks: Talk[] }) {
   const [selectedTag, setSelectedTag] = useState(ALL_TALK_TAG);
   const [query, setQuery] = useState("");
   const [appliedQuery, setAppliedQuery] = useState("");
@@ -76,8 +81,12 @@ export function TalksBanner() {
   }, []);
 
   const appliedKeyword = appliedQuery.trim().toLowerCase();
+  const tags = [
+    ALL_TALK_TAG,
+    ...Array.from(new Set(talks.flatMap((talk) => talk.tags))),
+  ];
 
-  const visibleTalks = TALKS.filter((talk) => {
+  const visibleTalks = talks.filter((talk) => {
     if (selectedTag !== ALL_TALK_TAG && !talk.tags.includes(selectedTag)) {
       return false;
     }
@@ -163,7 +172,7 @@ export function TalksBanner() {
       />
 
       <TalkTagBar
-        tags={TALK_TAGS}
+        tags={tags}
         selectedTag={selectedTag}
         onSelectTag={handleSelectTag}
       />

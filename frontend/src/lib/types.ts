@@ -190,3 +190,45 @@ export interface DataResult<T> {
   data: T;
   source: DataSource;
 }
+
+/** 看板娘回答的情绪，和后端 ChatReply.emotion 一一对应 */
+export type AnonEmotion =
+  | "happy"
+  | "excited"
+  | "sad"
+  | "angry"
+  | "surprised"
+  | "shy"
+  | "thinking"
+  | "neutral";
+
+/** AI 回答时挑选的语义动作，前端再映射到具体模型动作组 */
+export type AnonMotion =
+  | "none"
+  | "nod"
+  | "shake_head"
+  | "wave"
+  | "smile"
+  | "laugh"
+  | "angry"
+  | "sad"
+  | "cry"
+  | "surprised"
+  | "think"
+  | "question"
+  | "serious"
+  | "wink"
+  | "pose";
+
+/** 多轮对话里的一轮历史 */
+export interface AnonChatTurn {
+  role: "user" | "assistant";
+  content: string;
+}
+
+/** 看板娘对话接口的响应 */
+export interface AnonChatReply {
+  reply: string;
+  emotion: AnonEmotion;
+  motion: AnonMotion;
+}

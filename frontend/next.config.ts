@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 
+// 上传图片由 FastAPI 提供，与公开站不同源；next/image 需要显式放行该源。
+// 地址与公开站调用后端用的 NEXT_PUBLIC_API_BASE_URL 保持一致。
+const apiUrl = new URL(
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1",
+);
+
 const nextConfig: NextConfig = {
   turbopack: {
     rules: {
@@ -8,6 +14,17 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: apiUrl.protocol === "https:" ? "https" : "http",
+        hostname: apiUrl.hostname,
+        port: apiUrl.port,
+        pathname: "/uploads/**",
+      },
+    ],
   },
 
   // 开发模式左下角的路由徽标（Next 内置的 Dev Tools 指示器）挪到右下角，

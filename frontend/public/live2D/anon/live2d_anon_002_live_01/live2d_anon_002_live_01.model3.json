@@ -1,0 +1,77 @@
+{
+  "url": "live2d_anon_002_live_01.model3.json",
+  "Version": 3,
+  "FileReferences": {
+    "Moc": "live2d_anon_002_live_01.moc3",
+    "Textures": [
+      "Textures/texture_00.png",
+      "Textures/texture_01.png",
+      "Textures/texture_02.png"
+    ],
+    "Motions": {
+      "mtn_action_01": [
+        {
+          "File": "Motions/mtn_action_01.motion3.json"
+        }
+      ],
+      "mtn_finish_01": [
+        {
+          "File": "Motions/mtn_finish_01.motion3.json"
+        }
+      ],
+      "mtn_idle_01": [
+        {
+          "File": "Motions/mtn_idle_01.motion3.json"
+        }
+      ],
+      "mtn_play01_01": [
+        {
+          "File": "Motions/mtn_play01_01.motion3.json"
+        }
+      ],
+      "mtn_play01_02": [
+        {
+          "File": "Motions/mtn_play01_02.motion3.json"
+        }
+      ],
+      "mtn_play01_03": [
+        {
+          "File": "Motions/mtn_play01_03.motion3.json"
+        }
+      ],
+      "mtn_play02_01": [
+        {
+          "File": "Motions/mtn_play02_01.motion3.json"
+        }
+      ],
+      "mtn_play02_02": [
+        {
+          "File": "Motions/mtn_play02_02.motion3.json"
+        }
+      ],
+      "mtn_play02_03": [
+        {
+          "File": "Motions/mtn_play02_03.motion3.json"
+        }
+      ]
+    },
+    "Expressions": []
+  },
+  "Groups": [
+    {
+      "Target": "Parameter",
+      "Name": "EyeBlink",
+      "Ids": [
+        "ParamEyeLOpen",
+        "ParamEyeROpen"
+      ]
+    },
+    {
+      "Target": "Parameter",
+      "Name": "LipSync",
+      "Ids": [
+        "ParamMouthOpenY"
+      ]
+    }
+  ]
+}

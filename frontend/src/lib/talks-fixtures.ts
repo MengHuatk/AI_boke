@@ -264,9 +264,3 @@ export const TALKS: TalkDetail[] = [
 回家的时候鞋底湿了一点。我把伞放回门口，突然觉得今天可以到此为止了。`,
   },
 ];
-
-/** 「全部」固定在首位，其余标签按第一次出现的顺序排列 */
-export const TALK_TAGS = [
-  ALL_TALK_TAG,
-  ...Array.from(new Set(TALKS.flatMap((talk) => talk.tags))),
-];

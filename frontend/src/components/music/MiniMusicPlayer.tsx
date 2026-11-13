@@ -11,8 +11,6 @@ import { findActiveLine } from "@/lib/music-fixtures";
 /** 胶囊盒子的设计尺寸 */
 const BOX_WIDTH = 274;
 const BOX_HEIGHT = 58;
-/** 默认距视口右下角的距离 */
-const EDGE_GAP = 24;
 /** 拖动后的位置存在这里，刷新页面也能恢复 */
 const POSITION_KEY = "music-box-position";
 
@@ -21,7 +19,7 @@ interface BoxPosition {
   y: number;
 }
 
-/** 把盒子钉在视口坐标，并解除默认的右下角锚定 */
+/** 把盒子钉在视口坐标，并解除默认的右上角锚定 */
 function applyPosition(box: HTMLDivElement, position: BoxPosition) {
   box.style.left = `${position.x}px`;
   box.style.top = `${position.y}px`;
@@ -49,8 +47,8 @@ function readStoredPosition(): BoxPosition | null {
  *
  * 左侧是当前曲目的圆形唱片封面、歌名和当前歌词行；
  * 右侧 60×32 控制面板只有播放/暂停和下一首。
- * 盒子默认贴在视口右下角，可按住左半区拖动；拖动结果写入
- * localStorage，站内切页和刷新后都停在原位。
+ * 盒子默认贴在右上角、桌面导航栏下方（移动端导航隐藏，贴近顶部），
+ * 可按住左半区拖动；拖动结果写入 localStorage，站内切页和刷新后都停在原位。
  *
  * 播放状态来自 MusicProvider，和音乐页大播放器共用同一个音频源，
  * 所以在任何页面暂停、切歌，音乐页都会同步。
@@ -86,7 +84,7 @@ export function MiniMusicPlayer() {
       positionRef.current = saved;
       applyPosition(box, saved);
     }
-    // 定位完成后再显形，避免恢复位置时先闪一下右下角
+    // 定位完成后再显形，避免恢复位置时先闪一下默认位置
     const frame = window.requestAnimationFrame(() => setReady(true));
 
     const handleResize = () => {
@@ -146,7 +144,7 @@ export function MiniMusicPlayer() {
       role="group"
       aria-label="迷你音乐播放器"
       className={cn(
-        "mini-player-shell fixed z-[55] flex h-[58px] w-[274px] cursor-grab touch-none items-center gap-2 rounded-full border border-white/10 bg-[#0a1424] pr-2 pl-2 shadow-[0_16px_40px_-18px_rgb(0_0_0/0.95)] transition-[opacity,filter,transform] ease-out select-none active:cursor-grabbing",
+        "mini-player-shell fixed right-6 top-4 z-[55] flex h-[58px] w-[274px] cursor-grab touch-none items-center gap-2 rounded-full border border-white/10 bg-[#0a1424] pr-2 pl-2 shadow-[0_16px_40px_-18px_rgb(0_0_0/0.95)] transition-[opacity,filter,transform] ease-out select-none active:cursor-grabbing md:top-[88px]",
         // 进入首页：600ms 模糊溶解；离开首页：350ms 淡入
         inactive
           ? "pointer-events-none scale-[0.96] opacity-0 blur-[6px] duration-[600ms]"
@@ -154,7 +152,6 @@ export function MiniMusicPlayer() {
       )}
       inert={inactive}
       aria-hidden={inactive}
-      style={{ right: EDGE_GAP, bottom: EDGE_GAP }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}

@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -95,3 +96,185 @@ class HomePayload(BaseModel):
     featured_posts: list[PostSummary]
     tags: list[TagStat]
     stats: SiteStats
+
+
+class ChatTurn(BaseModel):
+    """多轮对话里的一轮历史。"""
+
+    role: Literal["user", "assistant"]
+    content: str
+
+
+class ChatRequest(BaseModel):
+    """看板娘对话请求。history 只带当前消息之前的轮次。"""
+
+    message: str = Field(min_length=1, max_length=200, description="用户这一轮说的话")
+    history: list[ChatTurn] = Field(default_factory=list, max_length=6)
+
+
+class ChatReply(BaseModel):
+    """看板娘的回答、情绪，以及这句话适合的动作。"""
+
+    reply: str
+    emotion: Literal[
+        "happy",
+        "excited",
+        "sad",
+        "angry",
+        "surprised",
+        "shy",
+        "thinking",
+        "neutral",
+    ]
+    motion: Literal[
+        "none",
+        "nod",
+        "shake_head",
+        "wave",
+        "smile",
+        "laugh",
+        "angry",
+        "sad",
+        "cry",
+        "surprised",
+        "think",
+        "question",
+        "serious",
+        "wink",
+        "pose",
+    ]
+
+
+# ---------------------------------------------------------------------------
+# 杂谈（公开只读）
+# ---------------------------------------------------------------------------
+
+
+class TalkSummary(BaseModel):
+    """杂谈摘要，字段与前端 ``Talk`` 保持一致。"""
+
+    id: str
+    slug: str
+    title: str
+    excerpt: str
+    cover: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    mood: str = ""
+    published_at: datetime
+
+
+class TalkDetail(TalkSummary):
+    """杂谈详情，追加 Markdown 正文。"""
+
+    body: str = ""
+
+
+# ---------------------------------------------------------------------------
+# 管理后台：写入模型
+# ---------------------------------------------------------------------------
+
+PostStatus = Literal["draft", "published"]
+
+
+class PostWrite(BaseModel):
+    """新建或更新文章。``reading_minutes`` 与发布时间由后端推导。"""
+
+    slug: str = Field(
+        min_length=1,
+        max_length=200,
+        pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$",
+        description="小写字母、数字与连字符",
+    )
+    title: str = Field(min_length=1, max_length=300)
+    excerpt: str = Field(default="", max_length=1000)
+    cover: str | None = Field(default=None, max_length=500)
+    body: str = ""
+    tags: list[str] = Field(default_factory=list, max_length=20)
+    status: PostStatus = "draft"
+    featured: bool = False
+    published_at: datetime | None = None
+
+
+class TalkWrite(BaseModel):
+    """新建或更新杂谈。"""
+
+    slug: str = Field(
+        min_length=1,
+        max_length=200,
+        pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$",
+        description="小写字母、数字与连字符",
+    )
+    title: str = Field(min_length=1, max_length=300)
+    excerpt: str = Field(default="", max_length=1000)
+    cover: str | None = Field(default=None, max_length=500)
+    body: str = ""
+    tags: list[str] = Field(default_factory=list, max_length=20)
+    mood: str = Field(default="", max_length=100)
+    status: PostStatus = "draft"
+    published_at: datetime | None = None
+
+
+# ---------------------------------------------------------------------------
+# 管理后台：读取模型
+# ---------------------------------------------------------------------------
+
+
+class AdminPostSummary(BaseModel):
+    """后台文章列表项，比公开摘要多了状态与时间戳。"""
+
+    id: str
+    slug: str
+    title: str
+    excerpt: str
+    cover: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    status: PostStatus
+    featured: bool = False
+    reading_minutes: int = 1
+    published_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class AdminPostDetail(AdminPostSummary):
+    body: str = ""
+
+
+class AdminTalkSummary(BaseModel):
+    """后台杂谈列表项。"""
+
+    id: str
+    slug: str
+    title: str
+    excerpt: str
+    cover: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    mood: str = ""
+    status: PostStatus
+    reading_minutes: int = 1
+    published_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class AdminTalkDetail(AdminTalkSummary):
+    body: str = ""
+
+
+# ---------------------------------------------------------------------------
+# 管理后台：登录与上传
+# ---------------------------------------------------------------------------
+
+
+class AdminLoginRequest(BaseModel):
+    password: str = Field(min_length=1, max_length=200)
+
+
+class AdminSession(BaseModel):
+    authenticated: bool
+
+
+class UploadResult(BaseModel):
+    url: str
+    width: int
+    height: int

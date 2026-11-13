@@ -9,7 +9,6 @@
     { "label": "归档", "href": "/archive" },
     { "label": "照片墙", "href": "/photos" },
     { "label": "音乐", "href": "/music" },
-    { "label": "灵境", "href": "/realm" },
     { "label": "说说", "href": "/moments" },
     { "label": "杂谈", "href": "/talks" },
     { "label": "友链", "href": "/links" },

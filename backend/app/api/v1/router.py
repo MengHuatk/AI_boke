@@ -7,9 +7,11 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from app.api.v1 import posts, site, tags
+from app.api.v1 import chat, posts, site, tags, talks
 
 api_router = APIRouter()
 api_router.include_router(site.router)
 api_router.include_router(posts.router)
+api_router.include_router(talks.router)
 api_router.include_router(tags.router)
+api_router.include_router(chat.router)

@@ -28,15 +28,41 @@ class Settings(BaseSettings):
     debug: bool = True
 
     # ---- 数据来源 ----
-    # 当前版本使用 JSON 文件作为内容源（见 repositories/json_repository.py）。
-    # 后续接入数据库时，只需新增一个 Repository 实现并把这里换成连接串。
+    # 文章与杂谈存 SQLite；site.json / profile.json 仍由仓储直接读取。
+    database_url: str = f"sqlite:///{BASE_DIR / 'app' / 'blog.db'}"
     data_dir: Path = BASE_DIR / "app" / "data"
+
+    # ---- 管理后台 ----
+    # 默认关闭，本地开发时在 backend/.env 里显式打开。
+    admin_enabled: bool = False
+    admin_password_hash: str = ""
+    session_secret: str = ""
+    admin_session_max_age: int = 12 * 60 * 60
+    # 公网 HTTPS 部署时设为 true，让会话 Cookie 只走加密连接。
+    admin_cookie_secure: bool = False
+
+    # ---- 图片上传 ----
+    upload_dir: Path = BASE_DIR / "uploads"
+    upload_url_prefix: str = "/uploads"
+    upload_max_bytes: int = 5 * 1024 * 1024
+    # 上传接口返回的完整 URL 前缀。公开站与后端不同源时，必须是浏览器
+    # 能访问到的后端地址；留空则返回相对路径。
+    public_base_url: str = "http://127.0.0.1:8000"
 
     # ---- 跨域 ----
     cors_origins: list[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ]
+
+    # ---- 看板娘 AI 对话 ----
+    # OpenAI 兼容接口。key 只放在后端 .env，不进入前端包。
+    ai_base_url: str = "https://api.siliconflow.cn/v1"
+    ai_api_key: str = ""
+    ai_model: str = "Qwen/Qwen2.5-7B-Instruct"
+    ai_timeout: float = 30.0
+    ai_max_tokens: int = 300
+    ai_rate_limit_per_minute: int = 10
 
 
 @lru_cache

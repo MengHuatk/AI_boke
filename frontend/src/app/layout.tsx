@@ -4,6 +4,7 @@ import Script from "next/script";
 
 import { SakuraPetals } from "@/components/layout/SakuraPetals";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { Live2DAnon } from "@/components/live2d/Live2DAnon";
 import { MiniMusicPlayer } from "@/components/music/MiniMusicPlayer";
 import { MusicProvider } from "@/components/music/MusicProvider";
 import { MusicRain } from "@/components/music/MusicRain";
@@ -73,6 +74,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <SakuraPetals />
             <MiniMusicPlayer />
             <RainControl />
+            <Live2DAnon />
           </RainSettingsProvider>
         </MusicProvider>
       </body>
