@@ -32,6 +32,34 @@ export const uiConfig = {
 
   /** 首页精选文章条数 */
   homeFeaturedLimit: readNumber(process.env.NEXT_PUBLIC_HOME_FEATURED_LIMIT, 3),
+
+  /** 站点正式上线时间（ISO 8601，含时区）。首页状态条按此累计稳定运行时长 */
+  startedAt:
+    process.env.NEXT_PUBLIC_SITE_STARTED_AT ?? "2026-11-14T14:29:00+08:00",
+
+  /** 萌ICP备案号。注册后只改数字，查询链接由状态条自动拼接 */
+  icpNumber: process.env.NEXT_PUBLIC_ICP_NUMBER ?? "2026XXXXX",
+} as const;
+
+/**
+ * 评论区配置（giscus）。
+ *
+ * 评论寄存在一个独立的公开仓库的 Discussions 里：该仓库必须公开、
+ * 已开启 Discussions，并已安装 giscus App。四个值都在 https://giscus.app/
+ * 生成。缺任一项时 GiscusComments 退化成说明牌，页面其余部分不受影响。
+ */
+export const commentConfig = {
+  /** 承载评论的仓库，形如 MengHuatk/ai-boke-comments */
+  repo: process.env.NEXT_PUBLIC_GISCUS_REPO ?? "",
+
+  /** 仓库 node id，giscus 用它定位仓库 */
+  repoId: process.env.NEXT_PUBLIC_GISCUS_REPO_ID ?? "",
+
+  /** 讨论分类名，新讨论会建在这个分类下 */
+  category: process.env.NEXT_PUBLIC_GISCUS_CATEGORY ?? "Announcements",
+
+  /** 分类 node id */
+  categoryId: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID ?? "",
 } as const;
 
 /**

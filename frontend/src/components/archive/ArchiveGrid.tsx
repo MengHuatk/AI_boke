@@ -28,11 +28,12 @@ export function ArchiveGrid({ posts, animateEntrance = true }: ArchiveGridProps)
   return (
     <div
       className={cn(
-        "archive-scroll min-h-0 w-full max-w-[944px] flex-1 overflow-y-auto",
+        // 手机端不再吃满一屏内滚，滚动交还整页
+        "archive-scroll min-h-0 w-full max-w-[944px] flex-1 overflow-y-auto max-md:flex-none max-md:overflow-visible",
         animateEntrance && "view-fade",
       )}
     >
-      <ul className="grid grid-cols-3 justify-items-center gap-6">
+      <ul className="grid grid-cols-3 justify-items-center gap-6 max-md:grid-cols-2 max-md:gap-3">
         {posts.map((post, index) => (
           <ArchiveCard
             key={post.id}

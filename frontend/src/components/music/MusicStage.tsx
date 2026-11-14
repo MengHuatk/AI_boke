@@ -106,8 +106,8 @@ export function MusicStage() {
         />
       </div>
 
-      {/* 1198px 宽、高度自适应的评论盒 */}
-      <MusicComments />
+      {/* 1198px 宽、高度自适应的评论盒；评论按当前曲目独立开讨论 */}
+      <MusicComments trackId={track.id} />
     </section>
   );
 }

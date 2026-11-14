@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import { CircleNav } from "@/components/layout/CircleNav";
@@ -97,11 +97,14 @@ export function Navbar({ site }: NavbarProps) {
               href="/"
               className="flex shrink-0 items-center gap-2.5 transition-opacity hover:opacity-85"
             >
-              <span className="keep-light grid size-7 place-items-center rounded-full bg-gradient-to-br from-brand-300 to-brand-600 text-[13px] font-bold text-white shadow-[0_4px_14px_-4px_var(--color-brand-500)]">
-                {site.name.slice(0, 1)}
-              </span>
-              <span className="text-sm font-semibold tracking-tight text-white/90">
-                {site.name}
+              <span className="text-[30px] font-semibold tracking-tight text-white/90">
+                {/* 站名里的「の」单独染成淡紫，其余跟随导航文字色 */}
+                {site.name.split("の").map((part, index) => (
+                  <Fragment key={index}>
+                    {index > 0 && <span className="text-brand-300">の</span>}
+                    {part}
+                  </Fragment>
+                ))}
               </span>
             </SmartLink>
 
@@ -112,7 +115,7 @@ export function Navbar({ site }: NavbarProps) {
                   <NavLink
                     item={item}
                     active={isActive(pathname, item.href)}
-                    className="block px-3 py-2 text-sm"
+                    className="block px-3 py-2 text-[17px]"
                   />
                 </li>
               ))}

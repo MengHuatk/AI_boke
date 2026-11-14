@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   Glass Notes —— 全局样式与设计令牌
+   梦华の小站 —— 全局样式与设计令牌
 
    分层约定：
    1. @theme       声明设计令牌，Tailwind 会自动生成对应工具类
@@ -39,6 +39,14 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: "DaMengDouDing";
+  src: url("/font/DaMengDouDing-Regular-2.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 
 @theme {
   /* ---------- 字体 ---------- */
@@ -50,7 +58,7 @@
   /* 归档卡片标题/简介用（消费方 ArchiveCard.tsx 的 font-xiaowei） */
   --font-xiaowei: "ZCOOL XiaoWe","YaHei Web", var(--font-sans);
   /* 音乐页左右两盒用（消费方 MusicPlayer / MusicRightPanel 的 font-yahei） */
-  --font-yahei: "YaHei Web", "Microsoft YaHei", var(--font-sans);
+  --font-yahei:"DaMengDouDing", "YaHei Web", "Microsoft YaHei", var(--font-sans);
 
   /* ---------- 圆角 ---------- */
   --radius-glass: 1.25rem;
@@ -88,6 +96,8 @@
   --animate-fade-up: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
   /* 友链卡片的在线呼吸点（消费方 FriendCard.tsx） */
   --animate-online-breathe: online-breathe 2.6s ease-in-out infinite;
+  /* 首页状态栏的绿色运行指示灯（消费方 HomeStatusBar.tsx） */
+  --animate-status-breathe: status-breathe 2.4s ease-in-out infinite;
 
   /* 背景轮播的交叉淡化时长。每一张的停留间隔在 .env 里调，这里只管「淡多久」 */
   --duration-bg-fade: 1.5s;
@@ -143,6 +153,21 @@
     opacity: 1;
     transform: scale(1);
     box-shadow: 0 0 7px 2px rgb(169 164 255 / 0.5);
+  }
+}
+
+/* 首页状态栏的运行指示灯：绿色光晕随呼吸起落，与友链点同节拍但更短 */
+@keyframes status-breathe {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(0.85);
+    box-shadow: 0 0 0 0 rgb(74 222 128 / 0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 8px 2px rgb(74 222 128 / 0.5);
   }
 }
 
@@ -224,13 +249,20 @@
 /* 首页弹幕层：一条直线，从视口右侧外匀速走到左侧外。
    linear 是需求要求的「慢慢匀速」，ease 会在两端减速，反而把出生与消亡露出来；
    起止两点都在视口外，所以循环结束不需要接回原点。
+   首尾各 8% 的路程里做透明度淡入 / 淡出，避免弹幕硬切在视口边缘。
    消费方是 DanMu.tsx，配合 animation-fill-mode: forwards 使用——
    没有 forwards，动画结束那一帧元素会退回 left:0 闪现在视口左边缘 */
 @keyframes danmu-drift {
-  from {
+  0% {
+    opacity: 0;
     transform: translate3d(100vw, 0, 0);
   }
-  to {
+  8%,
+  92% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
     transform: translate3d(-100%, 0, 0);
   }
 }
@@ -1310,6 +1342,13 @@
 
 [data-theme="day"] [class~="marker:text-white/40"]::marker {
   color: rgb(36 45 70 / 0.45);
+}
+
+/* 字体弹幕：上面那组 text-white/* 反色会把弹幕也刷成墨色，
+   这里必须排在该段之后——两者特异性相同，靠书写顺序压过它。
+   夜间是 white/15，落在米色纸上几乎看不见；日间换成淡玫粉。 */
+[data-theme="day"] .danmu-text {
+  color: rgb(253, 191, 211);
 }
 
 /* ---------- 半透明白底与描边 ----------

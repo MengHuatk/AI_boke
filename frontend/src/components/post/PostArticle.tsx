@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { GiscusComments } from "@/components/post/GiscusComments";
+import { GlassCard } from "@/components/ui/GlassCard";
 import { Icon } from "@/components/ui/Icon";
 import { MarkdownBody } from "@/components/ui/MarkdownBody";
 import { SmartLink } from "@/components/ui/SmartLink";
@@ -76,10 +77,12 @@ export function PostArticle({ post }: { post: PostDetail }) {
         {/* 正文盒：与杂谈详情共用同一套 Markdown 渲染 */}
         <MarkdownBody body={post.body} />
 
-        {/* 评论区：GitHub 登录后才可发表，实现为 giscus 嵌入 */}
-        <section aria-label="评论" className="flex flex-col gap-4 pt-2">
-          <h2 className="font-xiaowei text-[18px] text-white/85">评论</h2>
-          <GiscusComments />
+        {/* 评论区：GitHub 登录后才可发表，实现为 giscus 嵌入；外圈浅玻璃把评论与正文分开 */}
+        <section aria-label="评论" className="pt-2">
+          <GlassCard tone="subtle" padding="md" className="flex flex-col gap-4">
+            <h2 className="font-xiaowei text-[18px] text-white/85">评论</h2>
+            <GiscusComments />
+          </GlassCard>
         </section>
       </div>
     </article>

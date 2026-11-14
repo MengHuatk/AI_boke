@@ -2,7 +2,7 @@
   {
     "id": "blog-glass",
     "title": "Glass Notes",
-    "readme_title": "一个把毛玻璃做到极致的个人博客",
+    "readme_title": "一个简单的个人博客",
     "tech_stack": ["Next.js", "React", "Tailwind CSS"],
     "repo_url": "https://github.com/MengHuatk/AI_boke",
     "emoji": ""

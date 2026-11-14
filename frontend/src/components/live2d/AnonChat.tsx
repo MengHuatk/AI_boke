@@ -196,7 +196,7 @@ export function AnonChat({ ready, onSpeak, onHide }: AnonChatProps) {
               left: "min(var(--model-center, 50%), calc(100% - min(170px, 50vw - 12px) - 12px))",
               bottom: "calc(100% - var(--model-top, 0px) - 70px)",
             }}
-            className="anon-bubble pointer-events-auto absolute z-[2] w-[340px] max-w-[calc(100vw-24px)] -translate-x-1/2 rounded-[18px] border-2 border-[#1f2430] bg-white px-4 py-3 font-yahei text-[12px] leading-relaxed text-[#1f2430] shadow-[4px_4px_0_rgb(31_36_48/0.18)]"
+            className="anon-bubble pointer-events-auto absolute z-[2] w-[340px] max-w-[calc(100vw-24px)] -translate-x-1/2 rounded-[18px] border-2 border-[#1f2430] bg-white px-4 py-3 font-xiaowei text-[16px] leading-relaxed text-[#1f2430] shadow-[4px_4px_0_rgb(31_36_48/0.18)]"
           >
             <p className="max-h-[120px] overflow-y-auto whitespace-pre-wrap break-words">
               {[...bubble.text].slice(0, visibleChars).join("")}

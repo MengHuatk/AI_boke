@@ -12,8 +12,8 @@ import type { HomePayload, PostDetail } from "@/lib/types";
 
 export const fallbackHome: HomePayload = {
   site: {
-    name: "个人博客",
-    title: "梦华の小站",
+    name: "梦华の小站",
+    title: "梦华の小站 · 写代码，也写生活",
     description: "世上只有一种英雄主义，那就是认清生活之后依旧热爱生活的人。",
     author: "梦华",
     nav: [

@@ -14,7 +14,7 @@ import { getPublishedPosts } from "@/lib/api";
  * 占位文章。
  */
 export const metadata = {
-  title: "归档",
+  title: "归档与探索",
 };
 
 export default async function ArchivePage() {

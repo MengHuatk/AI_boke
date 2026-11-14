@@ -113,7 +113,7 @@ export function HomeProfileCard({
       <div className="mt-auto flex items-end justify-between gap-4 pt-4">
         {/* 统计：数字在上、大类在下，竖线分隔 */}
         <div className="flex items-center gap-5">
-          <Stat value={articleCount} label="文章" />
+          <Stat className="s"  value={articleCount} label="文章"/>
           <span aria-hidden="true" className="h-9 w-px bg-white/10" />
           <Stat value={talkCount} label="杂谈" />
           <span aria-hidden="true" className="h-9 w-px bg-white/10" />

@@ -32,6 +32,7 @@ interface ArchiveTagBarProps {
  * 左侧标签按序铺开成至多两行胶囊（ALL_TAG 无 # 前缀，其余带 #），
  * 选中项垫一块淡紫发光药丸；右侧 232×44 是视图切换胶囊——
  * 一枚分段控件，两档共用外壳，选中段填淡紫，贴最右、垂直居中。
+ * 手机端没有切换这回事：胶囊整块隐藏，标签吃掉整行宽度，栏高由内容撑。
  */
 export function ArchiveTagBar({
   tags,
@@ -41,7 +42,7 @@ export function ArchiveTagBar({
   onViewModeChange,
 }: ArchiveTagBarProps) {
   return (
-    <div className="glass-panel flex h-[146px] w-full max-w-[944px] shrink-0 items-center gap-6 overflow-hidden rounded-glass px-6 ">
+    <div className="glass-panel flex h-[146px] w-full max-w-[944px] shrink-0 items-center gap-6 overflow-hidden rounded-glass px-6 max-md:h-auto max-md:gap-0 max-md:px-3 max-md:py-2.5">
       {/* 标签区：占满剩余宽度，胶囊换行铺开，两行放不下直接裁掉 */}
       <ul className="flex min-w-0 flex-1 flex-wrap content-center gap-2.5 ">
         {tags.map((tag) => (
@@ -63,11 +64,11 @@ export function ArchiveTagBar({
         ))}
       </ul>
 
-      {/* 视图切换胶囊：232×44，贴最右侧、垂直居中 */}
+      {/* 视图切换胶囊：232×44，贴最右侧、垂直居中；手机端没有切换这回事，整块隐藏 */}
       <div
         role="group"
         aria-label="归档视图切换"
-        className="glass-panel-subtle flex h-[44px] w-[232px] shrink-0 items-center gap-1 rounded-full p-1"
+        className="glass-panel-subtle flex h-[44px] w-[232px] shrink-0 items-center gap-1 rounded-full p-1 max-md:hidden"
       >
         {VIEW_MODES.map((mode) => (
           <button

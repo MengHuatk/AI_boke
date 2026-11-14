@@ -34,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: {
       default: site.title,
-      // 子页面只需导出 title: "文章标题"，即可自动拼成 "文章标题 · Glass Notes"
+      // 子页面只需导出 title: "文章标题"，即可自动拼成 "文章标题 · 梦华の小站"
       template: `%s · ${site.name}`,
     },
     description: site.description,

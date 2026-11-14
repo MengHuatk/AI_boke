@@ -19,11 +19,6 @@ export default function NotFound() {
         <h1 className="mb-2 text-xl font-semibold text-white/90">
           这个页面还在装修
         </h1>
-        <p className="mb-6 text-sm leading-relaxed text-white/50">
-          当前是初版，只完成了首页。
-          其余页面会按同样的毛玻璃风格逐步补齐。
-        </p>
-
         <div className="flex justify-center gap-2.5">
           <GlassButton href="/" variant="primary">
             回到首页

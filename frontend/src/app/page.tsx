@@ -3,6 +3,7 @@ import { HomeMusicCard } from "@/components/home/HomeMusicCard";
 import { HomeProfileCard } from "@/components/home/HomeProfileCard";
 import { HomeSearch } from "@/components/home/HomeSearch";
 import { HomeShowcase } from "@/components/home/HomeShowcase";
+import { HomeStatusBar } from "@/components/home/HomeStatusBar";
 import { DevNotice } from "@/components/ui/DevNotice";
 import {
   getAlbums,
@@ -66,6 +67,8 @@ export default async function HomePage() {
           talks={talks.slice(0, SHOWCASE_LIMIT)}
           spotlight={spotlight}
         />
+
+        <HomeStatusBar />
       </div>
     </>
   );

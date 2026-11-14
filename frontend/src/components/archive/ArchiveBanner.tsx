@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 import { ArchiveGrid } from "@/components/archive/ArchiveGrid";
 import { ArchiveSearch } from "@/components/archive/ArchiveSearch";
@@ -12,6 +12,26 @@ import {
 import { HubTimeline } from "@/components/archive/HubTimeline";
 import { cn } from "@/lib/format";
 import type { PostSummary } from "@/lib/types";
+
+/**
+ * 手机端判定，与 TalksBanner 同一套 useSyncExternalStore + matchMedia 写法。
+ * 服务端快照取 false（即按桌面渲染），水合后再按真实视口切换。
+ */
+const NARROW_QUERY = "(max-width: 767px)";
+
+function subscribeNarrow(callback: () => void) {
+  const query = window.matchMedia(NARROW_QUERY);
+  query.addEventListener("change", callback);
+  return () => query.removeEventListener("change", callback);
+}
+
+function getNarrowSnapshot() {
+  return window.matchMedia(NARROW_QUERY).matches;
+}
+
+function getServerNarrowSnapshot() {
+  return false;
+}
 
 /**
  * 归档页主体。
@@ -26,6 +46,9 @@ import type { PostSummary } from "@/lib/types";
  * 路由首访不播这套内部入场：整页入场交给 app/template.tsx 的
  * ViewTransition，否则新页快照会拍到组件的透明初态。只有用户主动
  * 切换视图时，才把 animateEntrance 打开。
+ *
+ * 手机端（<768px）：视图切换胶囊不显示，视图固定为矩形网格、两列常驻；
+ * 网格也不再吃满一屏内滚，高度交还文档流，滚动由整页接管。
  *
  * 文章由归档页服务端取好后传入；本组件只负责客户端的标签过滤、
  * 搜索与视图切换。
@@ -59,17 +82,28 @@ export function ArchiveBanner({ posts }: { posts: PostSummary[] }) {
       ? posts
       : posts.filter((post) => post.tags.includes(selectedTag));
 
-  const isHub = viewMode === "hub";
+  // 手机上没有视图切换胶囊，视图钉死在矩形网格；桌面仍按用户选的 viewMode。
+  // 窄屏判定放在 isHub 之前，服务端快照 false，与默认的 hub 一致。
+  const isNarrow = useSyncExternalStore(
+    subscribeNarrow,
+    getNarrowSnapshot,
+    getServerNarrowSnapshot,
+  );
+
+  const isHub = !isNarrow && viewMode === "hub";
 
   return (
     <section
       aria-label="归档内容"
       className={cn(
-        "mx-auto flex w-full max-w-[1024px] flex-col items-center gap-10",
-        isHub ? "pt-4" : "h-dvh rounded-glass pt-4 pb-10",
+        "mx-auto flex w-full max-w-[1024px] flex-col items-center gap-10 max-md:gap-6",
+        // 手机端放弃 h-dvh 内滚盒，滚动交还整页，避免嵌套滚动与手势打架
+        isHub
+          ? "pt-4"
+          : "h-dvh rounded-glass pt-4 pb-10 max-md:h-auto max-md:pb-8",
       )}
     >
-      <span className="text-[50px]  font-xiaowei">归档与探索</span>
+      <span className="text-[50px] font-xiaowei max-md:text-[30px]">归档与探索</span>
 
       <ArchiveSearch posts={visiblePosts} />
 

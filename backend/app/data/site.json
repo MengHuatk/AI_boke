@@ -1,8 +1,8 @@
 {
-  "name": "Glass Notes",
-  "title": "Glass Notes · 写代码，也写生活",
-  "description": "一个毛玻璃风格的个人博客，记录前端、后端，以及那些没写完的 side project。",
-  "author": "林澈",
+  "name": "梦华の小站",
+  "title": "梦华の小站",
+  "description": "残酷生活中的片刻安宁之地",
+  "author": "梦华",
   "nav": [
     { "label": "首页", "href": "/" },
     { "label": "项目", "href": "/projects" },

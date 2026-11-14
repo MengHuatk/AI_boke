@@ -27,7 +27,7 @@ export function HomeShowcase({ posts, talks, spotlight }: HomeShowcaseProps) {
     >
       <ArchiveShowcase posts={posts} />
 
-      <div className="flex w-full flex-col gap-6 xl:w-[705px] xl:gap-[26px]">
+      <div className="flex w-full flex-col gap-6 xl:w-[705px] xl:gap-6.5">
         {spotlight ? (
           <PhotoSpotlight {...spotlight} />
         ) : (

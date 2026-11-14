@@ -14,16 +14,16 @@
  * 四个不太显然的选择：
  *   - animation 带 forwards：否则动画结束那一帧元素会退回 left:0，在视口左边缘闪一下，
  *     而 React 真正把节点摘掉要等到下一次提交；
- *   - 不用负延迟错峰（草地与萤火虫的做法）：每条只跑一次，负延迟会让它一出生就已经在
- *     视口中间，「从最右飘进来」就不成立了。错峰改用出生延迟；
+ *   - 出生由单一节拍器串行驱动：每拍最多放一条，放完才挂下一拍。曾经是开局一次性
+ *     预排 N 个 setTimeout，主线程被编译 / 首屏绘制占住时，这些到期的任务会攒到
+ *     一起触发，表现为「一打开页面瞬间涌出一屏弹幕」；串行调度下最多迟到一拍；
  *   - 不走 useSyncExternalStore 快照：那套适合「一次性生成、永不变更」的数据，这里的
  *     列表持续增删。水合安全改由更简单的路径保证——首帧渲染空数组，随机全关在 effect 里；
  *   - 竖向互不遮挡：层内按 25px 一条划成若干轨道（20px 文本 + 5px 间隙，见 TRACK_PITCH），
- *     每条弹幕出生时独占一条空闲轨道，出屏归还。开局槽位数被夹在轨道数以内，
- *     所以任一出生瞬间必有空闲轨道，不需要重试或抢占。
+ *     每条弹幕出生时独占一条空闲轨道，出屏归还。
  *
- * 数量恒定不需要守卫：开局定下槽位数，此后每出一个补一个，总数锁在那个值上；
- * 补位留一点间隙，同屏数量就在该值上下小幅浮动，这就是「动态平衡」。
+ * 同屏上限 4 条：节拍器每拍先看在场上限再决定放不放，出屏归还轨道后由下一拍补位，
+ * 所以进场节奏始终是「一条一条」，不会几条同时出生。
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -132,20 +132,24 @@ interface Danmu {
 /** 轨道间距 = 20px 文本高 + 5px 间隙；文本高与 JSX 里的 text-[20px] leading-none 联动，改字号要一起改 */
 const TRACK_PITCH = 25;
 
+/** 同屏最多几条：节拍器只在未达上限时放新条目 */
+const ON_SCREEN_MAX = 4;
+
+/** 超过这个字数的文案算长句，duration 上浮，免得一闪而过读不完 */
+const LONG_TEXT_LENGTH = 40;
+const LONG_TEXT_SLOWDOWN = 1.4;
+
 const RANGE = {
-  countMin: 5,
-  countSpan: 6,
   /** 轨道区间上下界，占本层高度的百分比 */
   topMin: 50,
   topMax: 144,
   durationMin: 10,
   durationMax: 29,
-  /** 开局把各条出生时刻铺开到的总时长，s */
-  seedSweep: 8,
-  /** 叠在出生基准间隔上的抖动，s */
-  seedJitter: 1.5,
-  respawnMin: 0.4,
-  respawnMax: 2.2,
+  /** 第一条弹幕的出生延迟，s */
+  firstDelay: 0.3,
+  /** 节拍器两拍之间的随机间隔，s */
+  beatMin: 1.6,
+  beatMax: 2.8,
 } as const;
 
 function randomBetween(min: number, max: number): number {
@@ -167,13 +171,27 @@ function scheduleTimer(
 
 let nextId = 0;
 
-/** 一条新弹幕：落在指定轨道上，文案与速度各自随机 */
-function createDanmu(top: number): Danmu {
+/** 抽一条文案，跳过上一条刚用过的，避免同一句话连发两遍 */
+function pickText(previous: string | null): string {
+  const index = Math.floor(Math.random() * DANMU_TEXTS.length);
+  const text = DANMU_TEXTS[index];
+  if (text !== previous) return text;
+  return DANMU_TEXTS[(index + 1) % DANMU_TEXTS.length];
+}
+
+/** 一条新弹幕：落在指定轨道上，文案与速度各自随机；长句放慢 */
+function createDanmu(top: number, previousText: string | null): Danmu {
+  const text = pickText(previousText);
+  const duration = randomBetween(RANGE.durationMin, RANGE.durationMax);
+
   return {
     id: nextId++,
-    text: DANMU_TEXTS[Math.floor(Math.random() * DANMU_TEXTS.length)],
+    text,
     top,
-    duration: randomBetween(RANGE.durationMin, RANGE.durationMax),
+    duration:
+      text.length > LONG_TEXT_LENGTH
+        ? duration * LONG_TEXT_SLOWDOWN
+        : duration,
   };
 }
 
@@ -184,13 +202,20 @@ export function DanMu() {
   const tracks = useRef<number[]>([]);
   /** 被在场弹幕占用的轨道 */
   const usedTracks = useRef(new Set<number>());
+  /** 上一条用过的文案，抽词时跳过它 */
+  const lastText = useRef<string | null>(null);
 
   // 只碰 ref 与 setState，引用恒定，可安全进 effect 依赖
   const spawn = useCallback(() => {
     const free = tracks.current.filter((top) => !usedTracks.current.has(top));
+    // 没有空闲轨道就跳过这一拍：出屏会归还轨道，下一拍自然补上
+    if (free.length === 0) return;
+
     const top = free[Math.floor(Math.random() * free.length)];
     usedTracks.current.add(top);
-    setItems((prev) => [...prev, createDanmu(top)]);
+    const danmu = createDanmu(top, lastText.current);
+    lastText.current = danmu.text;
+    setItems((prev) => [...prev, danmu]);
   }, []);
 
   useEffect(() => {
@@ -205,17 +230,19 @@ export function DanMu() {
     );
 
     // 视口矮、轨道少时取小值，保证每条弹幕都独占得起一条轨道
-    const count = Math.min(
-      RANGE.countMin + Math.floor(Math.random() * RANGE.countSpan),
-      trackCount,
-    );
+    const cap = Math.min(ON_SCREEN_MAX, trackCount);
 
-    // 基准间隔按 index 递增再叠抖动：纯随机会让两条撞在同一时刻，等间隔又显得机械
-    for (let index = 0; index < count; index++) {
-      const seedDelay =
-        (index / count) * RANGE.seedSweep + randomBetween(0, RANGE.seedJitter);
-      scheduleTimer(timers.current, spawn, seedDelay);
-    }
+    // 节拍器：每拍最多放一条，放完再挂下一拍。串行调度是关键——
+    // 预排 N 个 timeout 时，主线程被占用的那几秒会把它们攒成一堆同时触发
+    const beat = () => {
+      if (usedTracks.current.size < cap) spawn();
+      scheduleTimer(
+        timers.current,
+        beat,
+        randomBetween(RANGE.beatMin, RANGE.beatMax),
+      );
+    };
+    scheduleTimer(timers.current, beat, RANGE.firstDelay);
 
     const pendingTimers = timers.current;
     const used = usedTracks.current;
@@ -224,19 +251,15 @@ export function DanMu() {
       pendingTimers.clear();
       used.clear();
       tracks.current = [];
+      lastText.current = null;
       setItems([]);
     };
   }, [spawn]);
 
-  /** 出屏即消失并归还轨道，随机间隙后再补一条新的 */
+  /** 出屏即消失并归还轨道；补位交给节拍器，这里不再单独排定时器 */
   function handleExited(danmu: Danmu) {
     usedTracks.current.delete(danmu.top);
     setItems((prev) => prev.filter((item) => item.id !== danmu.id));
-    scheduleTimer(
-      timers.current,
-      spawn,
-      randomBetween(RANGE.respawnMin, RANGE.respawnMax),
-    );
   }
 
   return (
@@ -248,7 +271,7 @@ export function DanMu() {
         <span
           key={danmu.id}
           onAnimationEnd={() => handleExited(danmu)}
-          className="absolute left-0 whitespace-nowrap font-danmu text-[20px] leading-none text-white/15"
+          className="danmu-text absolute left-0 whitespace-nowrap font-danmu text-[20px] leading-none text-white/15"
           style={{
             top: `${danmu.top}px`,
             animation: `danmu-drift ${danmu.duration}s linear forwards`,

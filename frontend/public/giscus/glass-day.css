@@ -1,0 +1,271 @@
+/*! MIT License
+ * Copyright (c) 2018 GitHub Inc.
+ * https://github.com/primer/primitives/blob/main/LICENSE
+ *
+ * 文件结构分两段：
+ *   1. giscus 官方 light.css 原文（底稿，一个变量都不能删）
+ *   2. AI_boke 日间「暖纸玻璃」覆盖（文末）
+ *
+ * 自定义主题会整份替换 giscus 内置主题，只改第二段即可。
+ * 由 app/giscus-theme/[theme]/route.ts 提供，地址见 GiscusComments。
+ */
+
+main {
+  --color-prettylights-syntax-comment: #6e7781;
+  --color-prettylights-syntax-constant: #0550ae;
+  --color-prettylights-syntax-entity: #8250df;
+  --color-prettylights-syntax-storage-modifier-import: #24292f;
+  --color-prettylights-syntax-entity-tag: #116329;
+  --color-prettylights-syntax-keyword: #cf222e;
+  --color-prettylights-syntax-string: #0a3069;
+  --color-prettylights-syntax-variable: #953800;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #82071e;
+  --color-prettylights-syntax-invalid-illegal-text: #f6f8fa;
+  --color-prettylights-syntax-invalid-illegal-bg: #82071e;
+  --color-prettylights-syntax-carriage-return-text: #f6f8fa;
+  --color-prettylights-syntax-carriage-return-bg: #cf222e;
+  --color-prettylights-syntax-string-regexp: #116329;
+  --color-prettylights-syntax-markup-list: #3b2300;
+  --color-prettylights-syntax-markup-heading: #0550ae;
+  --color-prettylights-syntax-markup-italic: #24292f;
+  --color-prettylights-syntax-markup-bold: #24292f;
+  --color-prettylights-syntax-markup-deleted-text: #82071e;
+  --color-prettylights-syntax-markup-deleted-bg: #ffebe9;
+  --color-prettylights-syntax-markup-inserted-text: #116329;
+  --color-prettylights-syntax-markup-inserted-bg: #dafbe1;
+  --color-prettylights-syntax-markup-changed-text: #953800;
+  --color-prettylights-syntax-markup-changed-bg: #ffd8b5;
+  --color-prettylights-syntax-markup-ignored-text: #eaeef2;
+  --color-prettylights-syntax-markup-ignored-bg: #0550ae;
+  --color-prettylights-syntax-meta-diff-range: #8250df;
+  --color-prettylights-syntax-brackethighlighter-angle: #57606a;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #8c959f;
+  --color-prettylights-syntax-constant-other-reference-link: #0a3069;
+  --color-btn-text: #24292f;
+  --color-btn-bg: #f6f8fa;
+  --color-btn-border: rgb(31 35 40 / 15%);
+  --color-btn-shadow: 0 1px 0 rgb(31 35 40 / 4%);
+  --color-btn-inset-shadow: inset 0 1px 0 rgb(255 255 255 / 25%);
+  --color-btn-hover-bg: #f3f4f6;
+  --color-btn-hover-border: rgb(31 35 40 / 15%);
+  --color-btn-active-bg: hsl(220deg 14% 93% / 100%);
+  --color-btn-active-border: rgb(31 35 40 / 15%);
+  --color-btn-selected-bg: hsl(220deg 14% 94% / 100%);
+  --color-btn-primary-text: #fff;
+  --color-btn-primary-bg: #1f883d;
+  --color-btn-primary-border: rgb(31 35 40 / 15%);
+  --color-btn-primary-shadow: 0 1px 0 rgb(31 35 40 / 10%);
+  --color-btn-primary-inset-shadow: inset 0 1px 0 rgb(255 255 255 / 3%);
+  --color-btn-primary-hover-bg: #1a7f37;
+  --color-btn-primary-hover-border: rgb(31 35 40 / 15%);
+  --color-btn-primary-selected-bg: hsl(137deg 66% 28% / 100%);
+  --color-btn-primary-selected-shadow: inset 0 1px 0 rgb(0 45 17 / 20%);
+  --color-btn-primary-disabled-text: rgb(255 255 255 / 80%);
+  --color-btn-primary-disabled-bg: #94d3a2;
+  --color-btn-primary-disabled-border: rgb(31 35 40 / 15%);
+  --color-action-list-item-default-hover-bg: rgb(208 215 222 / 32%);
+  --color-segmented-control-bg: #eaeef2;
+  --color-segmented-control-button-bg: #fff;
+  --color-segmented-control-button-selected-border: #8c959f;
+  --color-fg-default: #1F2328;
+  --color-fg-muted: #656d76;
+  --color-fg-subtle: #6e7781;
+  --color-canvas-default: #fff;
+  --color-canvas-overlay: #fff;
+  --color-canvas-inset: #f6f8fa;
+  --color-canvas-subtle: #f6f8fa;
+  --color-border-default: #d0d7de;
+  --color-border-muted: hsl(210deg 18% 87% / 100%);
+  --color-neutral-muted: rgb(175 184 193 / 20%);
+  --color-accent-fg: #0969da;
+  --color-accent-emphasis: #0969da;
+  --color-accent-muted: rgb(84 174 255 / 40%);
+  --color-accent-subtle: #ddf4ff;
+  --color-success-fg: #1a7f37;
+  --color-attention-fg: #9a6700;
+  --color-attention-muted: rgb(212 167 44 / 40%);
+  --color-attention-subtle: #fff8c5;
+  --color-danger-fg: #d1242f;
+  --color-danger-muted: rgb(255 129 130 / 40%);
+  --color-danger-subtle: #ffebe9;
+  --color-primer-shadow-inset: inset 0 1px 0 rgb(208 215 222 / 20%);
+  --color-scale-gray-1: #eaeef2;
+  --color-scale-blue-1: #b6e3ff;
+
+  /*! Extensions from @primer/css/alerts/flash.scss */
+  --color-social-reaction-bg-hover: var(--color-scale-gray-1);
+  --color-social-reaction-bg-reacted-hover: var(--color-scale-blue-1);
+}
+
+main .pagination-loader-container {
+  background-image: url("https://github.com/images/modules/pulls/progressive-disclosure-line.svg");
+}
+
+main .gsc-loading-image {
+  background-image: url("https://github.githubassets.com/images/mona-loading-default.gif");
+}
+
+/*! ============================================================
+ *  AI_boke 日间「暖纸玻璃」
+ *  面板底色取站点日间页面底 #f4f1ea 的同族暖白，文字用 body 的
+ *  rgb(24 31 51) 墨黑；主色压深到日间 brand-300 / brand-200 的 oklch
+ *  原值，保证暖白底上的对比度；内高光换成 90% 白，模拟纸面反光。
+ * ============================================================ */
+
+main {
+  color-scheme: light;
+  --color-fg-default: rgb(24 31 51 / 92%);
+  --color-fg-muted: rgb(24 31 51 / 62%);
+  --color-fg-subtle: rgb(24 32 52 / 42%);
+  --color-canvas-default: transparent;
+  --color-canvas-inset: rgb(255 255 255 / 55%);
+  --color-canvas-subtle: rgb(255 255 255 / 40%);
+  --color-canvas-overlay: rgb(255 255 255 / 97%);
+  --color-border-default: rgb(24 32 52 / 10%);
+  --color-border-muted: rgb(24 32 52 / 7%);
+  --color-neutral-muted: rgb(24 32 52 / 5%);
+  --color-neutral-subtle: rgb(24 32 52 / 9%);
+  --color-btn-text: rgb(24 31 51 / 88%);
+  --color-btn-bg: rgb(255 255 255 / 55%);
+  --color-btn-border: rgb(24 32 52 / 12%);
+  --color-btn-shadow: 0 1px 0 rgb(24 32 52 / 4%);
+  --color-btn-inset-shadow: inset 0 1px 0 rgb(255 255 255 / 40%);
+  --color-btn-hover-bg: rgb(255 255 255 / 80%);
+  --color-btn-hover-border: rgb(24 32 52 / 20%);
+  --color-btn-active-bg: rgb(255 255 255 / 92%);
+  --color-btn-active-border: rgb(24 32 52 / 22%);
+  --color-btn-selected-bg: rgb(255 255 255 / 70%);
+  --color-btn-primary-text: #fff;
+  --color-btn-primary-bg: oklch(0.52 0.15 275);
+  --color-btn-primary-border: oklch(0.52 0.15 275 / 30%);
+  --color-btn-primary-shadow: 0 1px 0 rgb(24 32 52 / 10%);
+  --color-btn-primary-inset-shadow: inset 0 1px 0 rgb(255 255 255 / 12%);
+  --color-btn-primary-hover-bg: oklch(0.47 0.16 275);
+  --color-btn-primary-hover-border: oklch(0.52 0.15 275 / 45%);
+  --color-btn-primary-selected-bg: oklch(0.5 0.15 275);
+  --color-btn-primary-selected-shadow: inset 0 1px 0 rgb(24 32 52 / 15%);
+  --color-btn-primary-disabled-bg: oklch(0.52 0.15 275 / 40%);
+  --color-btn-primary-disabled-border: oklch(0.52 0.15 275 / 20%);
+  --color-accent-fg: oklch(0.58 0.16 275);
+  --color-accent-emphasis: oklch(0.52 0.15 275);
+  --color-accent-muted: oklch(0.58 0.16 275 / 35%);
+  --color-accent-subtle: oklch(0.58 0.16 275 / 10%);
+  --color-segmented-control-bg: rgb(24 32 52 / 6%);
+  --color-segmented-control-button-bg: rgb(255 255 255 / 55%);
+  --color-segmented-control-button-selected-border: rgb(24 32 52 / 20%);
+  --color-action-list-item-default-hover-bg: rgb(24 32 52 / 6%);
+  --color-social-reaction-bg-hover: rgb(24 32 52 / 8%);
+  --color-social-reaction-bg-reacted-hover: oklch(0.58 0.16 275 / 14%);
+}
+
+/* ---------- 评论面板：暖纸玻璃 ---------- */
+
+.gsc-comment,
+.gsc-comment-box {
+  background-color: rgb(250 248 243 / 72%);
+  background-image: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 55%) 0%,
+    transparent 45%
+  );
+  border: 1px solid var(--color-border-default);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 90%);
+}
+
+/* ---------- ① 交互反馈 ---------- */
+
+.gsc-comment {
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.gsc-comment:hover {
+  border-color: rgb(24 32 52 / 18%);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 90%),
+    0 10px 24px -18px rgb(24 32 52 / 28%);
+}
+
+/* 输入框聚焦：边框转品牌色，外扩一圈柔光 */
+.gsc-comment-box .gsc-comment-box-textarea,
+.gsc-reply-box textarea {
+  background: rgb(255 255 255 / 55%);
+  border-color: rgb(24 32 52 / 12%);
+  border-radius: 12px;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.gsc-comment-box .gsc-comment-box-textarea:focus,
+.gsc-reply-box textarea:focus {
+  border-color: var(--color-accent-fg);
+  box-shadow: 0 0 0 3px oklch(0.58 0.16 275 / 18%);
+}
+
+main .btn {
+  border-radius: 10px;
+}
+
+/* ---------- ② 细节装饰 ---------- */
+
+/* 评论区头下方一条两端渐隐的细线 */
+.gsc-header::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-top: 12px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(24 32 52 / 14%),
+    transparent
+  );
+}
+
+/* 回复线程竖线：品牌色起笔，向下淡出 */
+.gsc-tl-line {
+  background-color: transparent;
+  background-image: linear-gradient(
+    180deg,
+    oklch(0.58 0.16 275 / 35%),
+    transparent
+  );
+}
+
+/* ---------- ③ 内容块 ---------- */
+
+.gsc-comment-content pre {
+  background-color: rgb(255 255 255 / 70%);
+  border: 1px solid rgb(24 32 52 / 10%);
+  border-radius: 12px;
+}
+
+.gsc-comment-content blockquote {
+  border-left-color: var(--color-accent-emphasis);
+  border-radius: 0 10px 10px 0;
+}
+
+/* 加载态换成纸色骨架，不再用 GitHub 的 gif */
+.gsc-loading-image {
+  background-image: none;
+  background-color: rgb(24 32 52 / 6%);
+  border-radius: 12px;
+  animation: giscus-glass-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes giscus-glass-breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* 表情回应做成胶囊，和站点的圆角芯片一致 */
+.gsc-social-reaction-summary-item,
+.gsc-reactions-button,
+.gsc-direct-reaction-button {
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+}

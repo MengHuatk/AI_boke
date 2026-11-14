@@ -247,13 +247,18 @@ export function CircleNav({ site, pathname }: CircleNavProps) {
                 return (
                   <div
                     key={item.href}
-                    className="absolute inset-0"
+                    // 这层只为定位而存在，整盘大小；若参与命中，后渲染的辐条会盖住
+                    // 前面所有圆点（转多少度内切圆都覆盖整盘），所以关掉它自己的命中
+                    className="pointer-events-none absolute inset-0"
                     style={{ transform: `rotate(${angle}deg)` }}
                   >
                     <SmartLink
                       href={item.href}
+                      // 点击即关圆盘：同页点击不会产生 pathname 变化，靠路由监听关不掉；
+                      // 拖拽后的误触已被 onClickCapture 拦下，这里只会收到真正的点击
+                      onClick={close}
                       className={cn(
-                        "circle-nav-item absolute left-1/2 grid place-items-center rounded-full px-1 text-center text-xs leading-tight transition-colors duration-200",
+                        "circle-nav-item pointer-events-auto absolute left-1/2 grid place-items-center rounded-full px-1 text-center text-xs leading-tight transition-colors duration-200",
                         active
                           ? "circle-nav-item-active bg-[#5C57FF] text-white shadow-[0_0_14px_rgba(92,87,255,0.75)]"
                           : "bg-[#272730] text-white/85 border-1 border-[#404052]"

@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { GiscusComments } from "@/components/post/GiscusComments";
+import { GlassCard } from "@/components/ui/GlassCard";
 import { Icon } from "@/components/ui/Icon";
 import { MarkdownBody } from "@/components/ui/MarkdownBody";
 import { SmartLink } from "@/components/ui/SmartLink";
@@ -74,10 +75,12 @@ export function TalkArticle({ talk }: { talk: TalkDetail }) {
         {/* 正文盒：与文章详情共用同一套 Markdown 渲染 */}
         <MarkdownBody body={talk.body} />
 
-        {/* 评论区：giscus，按当前路径映射讨论 */}
-        <section aria-label="评论" className="flex flex-col gap-4 pt-2">
-          <h2 className="font-xiaowei text-[18px] text-white/85">评论</h2>
-          <GiscusComments />
+        {/* 评论区：giscus，按当前路径映射讨论；外圈浅玻璃把评论与正文分开 */}
+        <section aria-label="评论" className="pt-2">
+          <GlassCard tone="subtle" padding="md" className="flex flex-col gap-4">
+            <h2 className="font-xiaowei text-[18px] text-white/85">评论</h2>
+            <GiscusComments />
+          </GlassCard>
         </section>
       </div>
     </article>

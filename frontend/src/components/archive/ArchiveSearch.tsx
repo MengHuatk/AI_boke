@@ -77,20 +77,20 @@ export function ArchiveSearch({ posts }: ArchiveSearchProps) {
  */
 function LookupRow({ post }: { post: PostSummary }) {
   return (
-    <li className="w-[500px] shrink-0">
+    <li className="w-[500px] shrink-0 max-md:w-full">
       <SmartLink
         href={`/posts/${post.slug}`}
         className="flex h-[82.5px] flex-col justify-center gap-2.5 rounded-lg px-6 transition-colors hover:bg-white/5"
       >
         <div className="flex items-center">
-          <h4 className="w-[381px] truncate font-xiaowei text-[16px] leading-6 text-white/85">
+          <h4 className="w-[381px] truncate font-xiaowei text-[16px] leading-6 text-white/85 max-md:w-auto max-md:min-w-0 max-md:flex-1">
             {post.title}
           </h4>
           <time className="w-[71px] shrink-0 text-right text-[12px] leading-6 text-white/45 tabular-nums">
             {post.published_at.slice(2, 10)}
           </time>
         </div>
-        <p className="w-[452px] truncate font-xiaowei text-[12px] leading-[19.5px] text-white/45">
+        <p className="w-[452px] truncate font-xiaowei text-[12px] leading-[19.5px] text-white/45 max-md:w-full">
           {post.excerpt}
         </p>
       </SmartLink>

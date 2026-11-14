@@ -8,7 +8,7 @@ import { MusicStage } from "@/components/music/MusicStage";
  * 页面本身只渲染 MusicStage。
  */
 export const metadata = {
-  title: "音乐",
+  title: "云端乐律",
 };
 
 export default function MusicPage() {

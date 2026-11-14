@@ -1,6 +1,10 @@
 import { PostWorkspace } from "@/components/post/PostWorkspace";
 import { getHomeData, getPost, getPublishedPosts } from "@/lib/api";
 
+interface PostPageProps {
+  params: Promise<{ slug: string }>;
+}
+
 /**
  * 文章详情页（/posts/[slug]）——归档卡片点击的落点，
  * 此前是归档页跳转链里唯一的 404。
@@ -9,13 +13,14 @@ import { getHomeData, getPost, getPublishedPosts } from "@/lib/api";
  * slug 不存在同理）；介绍盒吃首页聚合接口的 profile/socials；
  * 相关推荐取后端已发布文章里排除本篇之后的前三篇。
  */
-export const metadata = { title: "文章" };
+export async function generateMetadata({ params }: PostPageProps) {
+  const { slug } = await params;
+  const { data: post } = await getPost(slug);
 
-export default async function PostPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+  return { title: post.title, description: post.excerpt };
+}
+
+export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
   const [post, home, posts] = await Promise.all([
     getPost(slug),
